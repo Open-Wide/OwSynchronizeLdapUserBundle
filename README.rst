@@ -73,7 +73,7 @@ You need to implement a complete Fetch an search interface
 
 First configure security.yml. 
 
-.. code-block:: yml
+.. code-block:: php
     security:
         encoders:
             Symfony\Component\Security\Core\User\User: plaintext
