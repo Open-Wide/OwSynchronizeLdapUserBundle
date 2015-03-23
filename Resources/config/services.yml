@@ -11,8 +11,8 @@ parameters:
     ow_synchronize_ldap_user.ldap.fields_group_ez: 
       - name
 
-    ow_synchronize_ldap_user.post_event_subscriber_ldap.class: 'Ow\Bundle\SynchronizeLdapUserBundle\EventListener\LdapSecuritySubscriber'
-    ow_synchronize_ldap_user.user_helper.class: 'Ow\Bundle\SynchronizeLdapUserBundle\Helper\UserHelper'
+    ow_synchronize_ldap_user.post_event_subscriber_ldap.class: 'Ow\SynchronizeLdapUserBundle\EventListener\LdapSecuritySubscriber'
+    ow_synchronize_ldap_user.user_helper.class: 'Ow\SynchronizeLdapUserBundle\Helper\UserHelper'
     ow_synchronize_ldap_user.mode: update
     ow_synchronize_ldap_user.base_dn: dc=example,dc=com
     ow_synchronize_ldap_user.filter_user: '(&(objectclass=person)(uid=**USERNAME**))'

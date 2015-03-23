@@ -1,6 +1,6 @@
 <?php
 
-namespace Ow\Bundle\SynchronizeLdapUserBundle\DependencyInjection;
+namespace Ow\SynchronizeLdapUserBundle\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\FileLocator;

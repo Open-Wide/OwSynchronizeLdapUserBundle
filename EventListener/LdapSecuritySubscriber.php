@@ -1,6 +1,6 @@
 <?php
 
-namespace Ow\Bundle\SynchronizeLdapUserBundle\EventListener;
+namespace Ow\SynchronizeLdapUserBundle\EventListener;
 
 use eZ\Publish\API\Repository\UserService;
 use eZ\Publish\Core\MVC\Symfony\Event\InteractiveLoginEvent;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Ow\Bundle\SynchronizeLdapUserBundle;
+namespace Ow\SynchronizeLdapUserBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
