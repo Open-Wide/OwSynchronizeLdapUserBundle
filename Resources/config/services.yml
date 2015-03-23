@@ -1,0 +1,58 @@
+parameters:
+    ow_synchronize_ldap_user.ldap.parent_group.content_id: 223
+    ow_synchronize_ldap_user.ldap.parent_group.location_id: 218
+    ow_synchronize_ldap_user.ldap.user_password: dfSq56Qsd4Fsqf
+    ow_synchronize_ldap_user.ldap.fields_user_ldap:
+      - dn
+    ow_synchronize_ldap_user.ldap.fields_user_ez: 
+      - dn
+    ow_synchronize_ldap_user.ldap.fields_group_ldap:
+      - ou
+    ow_synchronize_ldap_user.ldap.fields_group_ez: 
+      - name
+
+    ow_synchronize_ldap_user.post_event_subscriber_ldap.class: 'Ow\Bundle\SynchronizeLdapUserBundle\EventListener\LdapSecuritySubscriber'
+    ow_synchronize_ldap_user.user_helper.class: 'Ow\Bundle\SynchronizeLdapUserBundle\Helper\UserHelper'
+    ow_synchronize_ldap_user.mode: update
+    ow_synchronize_ldap_user.base_dn: dc=example,dc=com
+    ow_synchronize_ldap_user.filter_user: '(&(objectclass=person)(uid=**USERNAME**))'
+    ow_synchronize_ldap_user.filter_group: '(&(objectclass=groupOfUniqueNames)(uniquemember=uid=**USERNAME**,dc=example,dc=com))'
+    ow_synchronize_ldap_user.verbose: false
+    ow_synchronize_ldap_user.admin.id: 14
+    ow_synchronize_ldap_user.synchronize: true
+    
+services:
+    ow_synchronize_ldap_user.user_helper:
+        class: %ow_synchronize_ldap_user.user_helper.class%
+        arguments: 
+          - @ezpublish.api.repository
+          - @ezpublish_legacy.kernel
+          - @ezpublish.api.service.user
+          - @imag_ldap.ldap_connection
+          - @logger
+          - %ow_synchronize_ldap_user.ldap.parent_group.location_id%
+          - %ow_synchronize_ldap_user.ldap.parent_group.content_id%
+          - %ow_synchronize_ldap_user.ldap.user_password%
+          - %ow_synchronize_ldap_user.ldap.fields_user_ldap%
+          - %ow_synchronize_ldap_user.ldap.fields_user_ez%
+          - %ow_synchronize_ldap_user.ldap.fields_group_ldap%
+          - %ow_synchronize_ldap_user.ldap.fields_group_ez%
+          - %ow_synchronize_ldap_user.mode%
+          - %ow_synchronize_ldap_user.base_dn%
+          - %ow_synchronize_ldap_user.filter_user%
+          - %ow_synchronize_ldap_user.filter_group%
+          - %ow_synchronize_ldap_user.verbose%
+          - %ow_synchronize_ldap_user.admin.id%
+        tags:
+            - { name: monolog.logger, channel: synchronize }
+
+    ow_synchronize_ldap_user.listener:
+        class: %ow_synchronize_ldap_user.post_event_subscriber_ldap.class%
+        arguments: 
+            - @ezpublish.api.service.user
+            - @ow_synchronize_ldap_user.user_helper
+            - %ow_synchronize_ldap_user.synchronize%
+            - @logger
+        tags:
+            - { name: kernel.event_subscriber }
+            - { name: monolog.logger, channel: synchronize }

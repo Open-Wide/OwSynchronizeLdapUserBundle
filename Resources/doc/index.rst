@@ -1,0 +1,1 @@
+This extension allows LDAP to authenticate users to your site and automatically create these users in your base EzPublish users.
