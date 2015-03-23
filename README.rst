@@ -45,7 +45,7 @@ Add OwSynchronizeLdapUser in your project's `composer.json`
 
     {
         "require": {
-            "ow/OwSynchronizeLdapUser": "dev-master"
+            "ow/synchronizeldapuser": "dev-master"
         }
     }
 
