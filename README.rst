@@ -42,6 +42,7 @@ Composer
 Add OwSynchronizeLdapUser in your project's `composer.json`
 
 .. code-block:: json
+
     {
         "require": {
             "ow/OwSynchronizeLdapUser": "dev-master"
@@ -53,6 +54,7 @@ Enable the Bundle
 =================
 
 .. code-block:: php
+
     <?php
     // ezpublish/EzPublishKernel.php
 
@@ -73,7 +75,8 @@ You need to implement a complete Fetch an search interface
 
 First configure security.yml. 
 
-.. code-block:: php
+.. code-block:: yml
+
     security:
         encoders:
             Symfony\Component\Security\Core\User\User: plaintext
