@@ -8,7 +8,7 @@ use eZ\Publish\Core\MVC\Symfony\MVCEvents;
 use IMAG\LdapBundle\Event\LdapUserEvent;
 use IMAG\LdapBundle\Event\LdapEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Ow\Bundle\SynchronizeLdapUserBundle\Helper\UserHelper;
+use Ow\SynchronizeLdapUserBundle\Helper\UserHelper;
 use Monolog\Logger;
 
 
@@ -23,7 +23,7 @@ class LdapSecuritySubscriber implements EventSubscriberInterface {
     private $userService;
 
     /**
-     * @var $userHelper \Ow\Bundle\SynchronizeLdapUserBundle\Helper\UserHelper
+     * @var $userHelper \Ow\SynchronizeLdapUserBundle\Helper\UserHelper
      */
     private $userHelper;
     private $username;
