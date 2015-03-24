@@ -17,39 +17,39 @@ class UserHelper {
     /**
      * @var \eZ\Publish\API\Repository\Repository
      */
-    private $repository;
-    private $kernel;
+    protected $repository;
+    protected $kernel;
 
     /**
      * @var $userService \eZ\Publish\Core\Repository\UserService
      */
-    private $userService;
+    protected $userService;
 
     /**
      * @var $ldapService \IMAG\LdapBundle\Manager\LdapConnection
      */
-    private $ldapService;
-    private $logger;
-    private $groupLdapLocationId;
-    private $groupLdapContentId;
-    private $password;
-    private $fieldsUserLdap;
-    private $fieldsUserEz;
-    private $fieldsGroupLdap;
-    private $fieldsGroupEz;
-    private $mode;
-    private $baseDn;
-    private $filterUser;
-    private $filterGroup;
-    private $verbose;
-    private $adminId;
-    private $infoUserLdap;
-    private $infoGroupLdap;
-    private $infoGroupLdapWithoutArray;
-    private $APIuser;
-    private $groupEz;
-    private $groupEzName;
-    private $posEz;
+    protected $ldapService;
+    protected $logger;
+    protected $groupLdapLocationId;
+    protected $groupLdapContentId;
+    protected $password;
+    protected $fieldsUserLdap;
+    protected $fieldsUserEz;
+    protected $fieldsGroupLdap;
+    protected $fieldsGroupEz;
+    protected $mode;
+    protected $baseDn;
+    protected $filterUser;
+    protected $filterGroup;
+    protected $verbose;
+    protected $adminId;
+    protected $infoUserLdap;
+    protected $infoGroupLdap;
+    protected $infoGroupLdapWithoutArray;
+    protected $APIuser;
+    protected $groupEz;
+    protected $groupEzName;
+    protected $posEz;
 
     public function __construct(Repository $repository, $kernel, UserService $userService, LdapConnection $ldapService, Logger $logger, $groupLdapLocationId, $groupLdapContentId, $password, $fieldsUserLdap, $fieldsUserEz, $fieldsGroupLdap, $fieldsGroupEz, $mode, $baseDn, $filterUser, $filterGroup, $verbose, $adminId) {
         $this->repository = $repository;
@@ -119,7 +119,7 @@ class UserHelper {
      * @param type $username
      * @return boolean
      */
-    private function searchInfo($username) {
+    protected function searchInfo($username) {
         try {
             $this->infoUserLdap = $this->searchInfoUser($username);
             $this->infoGroupLdap = $this->searchGroupUser($username);
@@ -134,7 +134,7 @@ class UserHelper {
      * @param type $username
      * @return boolean
      */
-    private function searchInfoUser($username) {
+    protected function searchInfoUser($username) {
 
         try {
             $ldapInfoUser = $this->ldapService->search(array(
@@ -161,7 +161,7 @@ class UserHelper {
      * @param type $username
      * @return boolean
      */
-    private function searchGroupUser($username) {
+    protected function searchGroupUser($username) {
         try {
             $ldapInfoGroup = $this->ldapService->search(array(
                 'base_dn' => $this->baseDn,
@@ -180,7 +180,7 @@ class UserHelper {
      * @param type $infoUserLdap
      * @return type
      */
-    private function getInfoUser($infoUserLdap) {
+    protected function getInfoUser($infoUserLdap) {
         $liste = array();
         for ($i = 0; $i < $infoUserLdap['count']; $i++) {
             foreach ($this->fieldsUserLdap as $field) {
@@ -195,7 +195,7 @@ class UserHelper {
      * @param type $infoGroupLdap
      * @return type
      */
-    public function getInfoGroup($infoGroupLdap) {
+    protected function getInfoGroup($infoGroupLdap) {
         $fields = array_unique($this->fieldsGroupLdap);
         $liste = array();
         for ($i = 0; $i < $infoGroupLdap['count']; $i++) {
@@ -211,7 +211,7 @@ class UserHelper {
      * @param type $infoGroup
      * @return type
      */
-    private function getInfoGroupWithoutArray($infoGroup) {
+    protected function getInfoGroupWithoutArray($infoGroup) {
         $liste = array();
         foreach ($infoGroup as $group) {
             $liste[] = $group['ou'];
@@ -226,7 +226,7 @@ class UserHelper {
      * @param type $field
      * @return string
      */
-    private function getFieldLdap($infoLdap, $index, $field) {
+    protected function getFieldLdap($infoLdap, $index, $field) {
         if (isset($infoLdap[$index][$field])) {
             if ($field == "dn") {
                 return $infoLdap[$index][$field];
@@ -243,7 +243,7 @@ class UserHelper {
      * @param type $dn
      * @return boolean
      */
-    private function findUserByDn($dn) {
+    protected function findUserByDn($dn) {
 
         if (empty($this->groupLdapLocationId)) {
             throw new Exception('The location of the parent group is not defined.');
@@ -275,7 +275,7 @@ class UserHelper {
      * @param type $login
      * @return boolean
      */
-    private function findUserBylogin($login) {
+    protected function findUserBylogin($login) {
         $legacyKernelClosure = $this->kernel;
         $loginExist = $legacyKernelClosure()->runCallback(
                 function () use ( $login ) {
@@ -299,7 +299,7 @@ class UserHelper {
      * @param type $fields
      * @return type
      */
-    private function newUser($parentContentIds = array(), $userName, $password = "", $mainLanguageCode = "fre-FR", $fields) {
+    protected function newUser($parentContentIds = array(), $userName, $password = "", $mainLanguageCode = "fre-FR", $fields) {
         try {
             $newUserCreateStruct = $this->userService->newUserCreateStruct($userName, $fields['mail'], $password, $mainLanguageCode, $contentType = null);
 
@@ -319,7 +319,7 @@ class UserHelper {
      * @param type $fields
      * @throws Exception
      */
-    private function updateUser($userId, $fields) {
+    protected function updateUser($userId, $fields) {
         try {
             $contentInfo = $this->repository->getContentService()->loadContentInfo($userId);
             $contentDraft = $this->repository->getContentService()->createContentDraft($contentInfo);
@@ -343,7 +343,7 @@ class UserHelper {
      * Seeking existing user groups in eZpublish
      * @return type
      */
-    private function findGroupEz() {
+    protected function findGroupEz() {
 
         if (empty($this->groupLdapLocationId)) {
             throw new Exception('The location of parent group is not defined.');
@@ -372,7 +372,7 @@ class UserHelper {
      * @param type $groupEz
      * @param type $groupLdap
      */
-    private function addGroups($groupEz, $groupLdap) {
+    protected function addGroups($groupEz, $groupLdap) {
 
         if (!is_array($groupEz)) {
             throw new Exception('Ez groups must be an array.');
@@ -400,7 +400,7 @@ class UserHelper {
      * @param type $parentContentId
      * @param type $userGroupeName
      */
-    private function newUserGroup($group, $groupLdapContentId = null) {
+    protected function newUserGroup($group, $groupLdapContentId = null) {
 
         try {
             if (!$groupLdapContentId) {
@@ -427,7 +427,7 @@ class UserHelper {
      * Search user's Location
      * @param type $APIuser
      */
-    private function findMultiPositionEz(\eZ\Publish\API\Repository\Values\User\User $APIuser) {
+    protected function findMultiPositionEz(\eZ\Publish\API\Repository\Values\User\User $APIuser) {
 
         $posEzs = $this->userService->loadUserGroupsOfUser($APIuser);
 
@@ -448,7 +448,7 @@ class UserHelper {
      * @param type $infoGroupLdapWithoutArray
      * @param type $posEzName
      */
-    private function addMissingPositions($infoGroupLdapWithoutArray, $posEzName) {
+    protected function addMissingPositions($infoGroupLdapWithoutArray, $posEzName) {
         $positionManquantes = array_diff($infoGroupLdapWithoutArray, $posEzName);
         if (is_array($positionManquantes) && count($positionManquantes) > 0) {
             foreach ($positionManquantes as $positionManquante) {
@@ -467,7 +467,7 @@ class UserHelper {
      * @param type $posEzName
      * @param type $infoGroupLdapWithoutArray
      */
-    private function deleteTooPosition($posEzName, $infoGroupLdapWithoutArray) {
+    protected function deleteTooPosition($posEzName, $infoGroupLdapWithoutArray) {
         $positionEnTrops = array_diff($posEzName, $infoGroupLdapWithoutArray);
         if (is_array($positionEnTrops) && count($positionEnTrops) > 0) {
             foreach ($positionEnTrops as $positionEnTrop) {
@@ -487,7 +487,7 @@ class UserHelper {
      * @return type
      * @throws Exception
      */
-    private function getFilterUser($username) {
+    protected function getFilterUser($username) {
         if (empty($username)) {
             throw new Exception('You must specify an user to use the filter.');
         }
@@ -503,7 +503,7 @@ class UserHelper {
      * @return type
      * @throws Exception
      */
-    private function getFilterGroup($username) {
+    protected function getFilterGroup($username) {
         if (empty($username)) {
             throw new Exception('You must specify an user to use the filter.');
         }
@@ -517,7 +517,7 @@ class UserHelper {
      * Log an info message
      * @param type $message
      */
-    public function info($message) {
+    protected function info($message) {
         if ($this->logger && $this->verbose) {
             $this->logger->info($message);
         }
@@ -527,7 +527,7 @@ class UserHelper {
      * Log an error message
      * @param type $message
      */
-    private function err($message) {
+    protected function err($message) {
         if ($this->logger) {
             $this->logger->err($message);
         }
@@ -537,7 +537,7 @@ class UserHelper {
      * Easy debug
      * @param type $var
      */
-    private function debug($var) {
+    protected function debug($var) {
         print "<pre>" . print_r($var, true) . "</pre>";
     }
 

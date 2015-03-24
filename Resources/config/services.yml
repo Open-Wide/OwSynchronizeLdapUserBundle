@@ -20,6 +20,7 @@ parameters:
     ow_synchronize_ldap_user.verbose: false
     ow_synchronize_ldap_user.admin.id: 14
     ow_synchronize_ldap_user.synchronize: true
+    ow_synchronize_ldap_user.default_user: ~
     
 services:
     ow_synchronize_ldap_user.user_helper:
@@ -52,6 +53,7 @@ services:
             - @ezpublish.api.service.user
             - @ow_synchronize_ldap_user.user_helper
             - %ow_synchronize_ldap_user.synchronize%
+            - %ow_synchronize_ldap_user.default_user%
             - @logger
         tags:
             - { name: kernel.event_subscriber }

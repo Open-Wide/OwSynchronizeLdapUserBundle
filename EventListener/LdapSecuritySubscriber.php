@@ -29,11 +29,13 @@ class LdapSecuritySubscriber implements EventSubscriberInterface {
     private $username;
     private $logger;
     private $synchronize;
+    private $defaultUser;
 
-    public function __construct(UserService $userService, UserHelper $userHelper, $synchronize, Logger $logger) {
+    public function __construct(UserService $userService, UserHelper $userHelper, $synchronize,$defaultUser, Logger $logger) {
         $this->userService = $userService;
         $this->userHelper = $userHelper;
         $this->synchronize = $synchronize;
+        $this->defaultUser = $defaultUser;
         $this->logger = $logger;
     }
 
@@ -58,7 +60,11 @@ class LdapSecuritySubscriber implements EventSubscriberInterface {
                     $event->setApiUser($this->userService->loadUserByLogin($this->getUsername()));
                 }
             }else{
-                $event->setApiUser($this->userService->loadUserByLogin($this->getUsername()));
+                if(isset($this->defaultUser) && !empty($this->defaultUser)){
+                    $event->setApiUser($this->userService->loadUserByLogin($this->defaultUser));
+                }else{
+                    $event->setApiUser($this->userService->loadUserByLogin($this->getUsername()));
+                }
             }
         }
     }

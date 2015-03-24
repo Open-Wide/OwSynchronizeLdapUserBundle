@@ -169,7 +169,7 @@ Configure ezpublish class user and user group
 
 You must create fields in your classes
 Exmple : mail, cn, sn, uid ......
-Fields declared in config.yml must exist
+Fields declared in config.yml must exist.
 
 Configure user group
 ====================
@@ -177,7 +177,7 @@ Configure user group
 Create an user group
 Exemple LDAP
 Configure content_id and location_id in parent_group_content_id and parent_group_location_id.
-Ldap users will be created in this group
+Ldap users will be created in this group.
 
 
 
