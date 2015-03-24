@@ -45,7 +45,7 @@ Add OwSynchronizeLdapUser in your project's `composer.json`
 
     {
         "require": {
-            "ow/synchronizeldapuser": "dev-master"
+            "ow/synchronizeldapuser-bundle": "dev-master"
         }
     }
 
@@ -62,7 +62,7 @@ Enable the Bundle
     {
         $bundles = array(
             // ...
-            new Ow\Bundle\SynchronizeLdapUserBundle\OwSynchronizeLdapUserBundle(),
+            new Ow\SynchronizeLdapUserBundle\OwSynchronizeLdapUserBundle(),
         );
     }
 
