@@ -6,9 +6,10 @@ use eZUser;
 use eZ\Publish\API\Repository\Repository;
 use eZ\Publish\API\Repository\Values\Content\Query;
 use eZ\Publish\API\Repository\Values\Content\Query\Criterion;
+use eZ\Publish\API\Repository\Values\User\UserUpdateStruct;
+use eZ\Publish\Core\Repository\UserService;
 use Monolog\Logger;
 use IMAG\LdapBundle\Manager\LdapConnection;
-use eZ\Publish\Core\Repository\UserService;
 use Exception;
 
 class UserHelper {
@@ -18,6 +19,7 @@ class UserHelper {
      */
     private $repository;
     private $kernel;
+
     /**
      * @var $userService \eZ\Publish\Core\Repository\UserService
      */
@@ -89,24 +91,23 @@ class UserHelper {
                 $this->APIuser = $this->newUser(array($parentGroup), $username, $this->password, "fre-FR", $this->infoUserLdap);
                 $this->info("Add user EZ " . $username);
             } else {
-                $this->APIuser = $this->userService->loadUser($user->id);
                 if ($this->mode == "update") {
+                    $this->APIuser = $this->updateUser($user->id, $this->infoUserLdap);
                     $this->info("Update user EZ " . $username);
-                    // update de l'utilisateur
-                    // @TODO
                 }
+                $this->APIuser = $this->userService->loadUser($user->id);
             }
 
             $this->findGroupEz();
             $this->addGroups($this->groupEzName, $this->infoGroupLdap);
-            $this->findGroupEz();            
+            $this->findGroupEz();
             $this->findMultiPositionEz($this->APIuser);
             $this->addMissingPositions($this->infoGroupLdapWithoutArray, $this->posEzName);
             $this->deleteTooPosition($this->posEzName, $this->infoGroupLdapWithoutArray);
 
             return true;
         } catch (Exception $e) {
-            $this->err("synchronizeUserAndGroup: ".$e->getMessage());
+            $this->err("synchronizeUserAndGroup: " . $e->getMessage());
             return false;
         }
 
@@ -141,7 +142,7 @@ class UserHelper {
                 'filter' => $this->getFilterUser($username),
             ));
         } catch (Exception $e) {
-            $this->err("searchInfoUser: ".$e->getMessage());
+            $this->err("searchInfoUser: " . $e->getMessage());
             throw $e;
         }
 
@@ -161,7 +162,7 @@ class UserHelper {
      * @return boolean
      */
     private function searchGroupUser($username) {
-        try{
+        try {
             $ldapInfoGroup = $this->ldapService->search(array(
                 'base_dn' => $this->baseDn,
                 'filter' => $this->getFilterGroup($username),
@@ -169,11 +170,11 @@ class UserHelper {
 
             return $this->getInfoGroup($ldapInfoGroup);
         } catch (Exception $e) {
-            $this->err("searchGroupUser: ".$e->getMessage());
+            $this->err("searchGroupUser: " . $e->getMessage());
             throw $e;
-        }        
+        }
     }
-    
+
     /**
      * Formating info user ldap
      * @param type $infoUserLdap
@@ -236,7 +237,7 @@ class UserHelper {
             return "";
         }
     }
-    
+
     /**
      * Return true if user ez math width dn
      * @param type $dn
@@ -244,13 +245,13 @@ class UserHelper {
      */
     private function findUserByDn($dn) {
 
-        if(empty($this->groupLdapLocationId)){
+        if (empty($this->groupLdapLocationId)) {
             throw new Exception('The location of the parent group is not defined.');
         }
-        if(empty($dn)){
+        if (empty($dn)) {
             throw new Exception('The dn is not defined.');
         }
-        
+
         $criteria = array(
             new Criterion\ParentLocationId($this->groupLdapLocationId),
             new Criterion\ContentTypeIdentifier(array('user')),
@@ -268,8 +269,7 @@ class UserHelper {
             return false;
         }
     }
-    
-    
+
     /**
      * Return true if user match width login
      * @param type $login
@@ -288,8 +288,8 @@ class UserHelper {
         } else {
             return false;
         }
-    }    
-    
+    }
+
     /**
      * Add a new user in ez base
      * @param type $parentContentIds
@@ -308,21 +308,47 @@ class UserHelper {
             }
             return $this->userService->createUser($newUserCreateStruct, $parentContentIds);
         } catch (Exception $e) {
-            $this->err("Unable to create new user : ".$e->getMessage());
+            $this->err("Unable to create new user : " . $e->getMessage());
             throw $e;
         }
-    }    
-    
+    }
+
+    /**
+     * Update User
+     * @param $userId
+     * @param type $fields
+     * @throws Exception
+     */
+    private function updateUser($userId, $fields) {
+        try {
+            $contentInfo = $this->repository->getContentService()->loadContentInfo($userId);
+            $contentDraft = $this->repository->getContentService()->createContentDraft($contentInfo);
+            $contentUpdateStruct = $this->repository->getContentService()->newContentUpdateStruct();
+            $contentUpdateStruct->initialLanguageCode = 'fre-FR';
+
+            foreach ($this->fieldsUserLdap as $key => $value) {
+                if (isset($this->fieldsUserEz[$key]) && isset($fields[$value])) {
+                    $contentUpdateStruct->setField($this->fieldsUserEz[$key], $fields[$value]);
+                }
+            }
+            $contentDraft = $this->repository->getContentService()->updateContent($contentDraft->versionInfo, $contentUpdateStruct);
+            $content = $this->repository->getContentService()->publishVersion( $contentDraft->versionInfo );
+        } catch (Exception $e) {
+            $this->err("Unable to update user : " . $e->getMessage());
+            throw $e;
+        }
+    }
+
     /**
      * Seeking existing user groups in eZpublish
      * @return type
      */
     private function findGroupEz() {
-        
-        if(empty($this->groupLdapLocationId)){
+
+        if (empty($this->groupLdapLocationId)) {
             throw new Exception('The location of parent group is not defined.');
-        }        
-        
+        }
+
         $criteria = array(
             new Criterion\ParentLocationId($this->groupLdapLocationId),
             new Criterion\ContentTypeIdentifier(array('user_group')),
@@ -339,23 +365,23 @@ class UserHelper {
         }
         $this->groupEz = $searchResult->searchHits;
         $this->groupEzName = $groups;
-    }    
-    
+    }
+
     /**
      * Add Ldap group in Ez group with multi locating
      * @param type $groupEz
      * @param type $groupLdap
      */
     private function addGroups($groupEz, $groupLdap) {
-        
-        if(!is_array($groupEz)){
+
+        if (!is_array($groupEz)) {
             throw new Exception('Ez groups must be an array.');
-        }          
-        if(!is_array($groupLdap)){
+        }
+        if (!is_array($groupLdap)) {
             throw new Exception('Ldap groups must be an array.');
-        } 
-        
-        try{
+        }
+
+        try {
             foreach ($groupLdap as $group) {
                 if (!in_array($group['ou'], $groupEz)) {
                     $this->info("Creating a new user group : " . $group['ou']);
@@ -364,11 +390,11 @@ class UserHelper {
                     $this->info("The " . $group['ou'] . " group already exists.");
                 }
             }
-        }catch(Exception $e){
+        } catch (Exception $e) {
             throw $e;
         }
-    }    
-    
+    }
+
     /**
      * Creating a new user group
      * @param type $parentContentId
@@ -376,7 +402,7 @@ class UserHelper {
      */
     private function newUserGroup($group, $groupLdapContentId = null) {
 
-        try{
+        try {
             if (!$groupLdapContentId) {
                 $groupLdapContentId = $this->groupLdapContentId;
             }
@@ -391,18 +417,18 @@ class UserHelper {
 
             // This call will fail with an "UnauthorizedException"
             $this->userService->createUserGroup($newUserGroupCreateStruct, $parentUserGroup);
-        }catch(Exception $e){
-            $this->err("Unable to create the new user group : ".$e->getMessage());
+        } catch (Exception $e) {
+            $this->err("Unable to create the new user group : " . $e->getMessage());
             throw $e;
         }
-    }    
-    
+    }
+
     /**
      * Search user's Location
      * @param type $APIuser
      */
     private function findMultiPositionEz(\eZ\Publish\API\Repository\Values\User\User $APIuser) {
-        
+
         $posEzs = $this->userService->loadUserGroupsOfUser($APIuser);
 
         $positions = array();
@@ -416,7 +442,7 @@ class UserHelper {
         $this->posEz = $positions;
         $this->posEzName = $positionsName;
     }
-   
+
     /**
      * Adds the location of the current user in groups
      * @param type $infoGroupLdapWithoutArray
@@ -462,12 +488,12 @@ class UserHelper {
      * @throws Exception
      */
     private function getFilterUser($username) {
-        if(empty($username)){
+        if (empty($username)) {
             throw new Exception('You must specify an user to use the filter.');
-        } 
-        if(empty($this->filterUser)){
+        }
+        if (empty($this->filterUser)) {
             throw new Exception('You must specify a filter.');
-        }                 
+        }
         return str_replace("**USERNAME**", $username, $this->filterUser);
     }
 
@@ -478,12 +504,12 @@ class UserHelper {
      * @throws Exception
      */
     private function getFilterGroup($username) {
-        if(empty($username)){
+        if (empty($username)) {
             throw new Exception('You must specify an user to use the filter.');
-        } 
-        if(empty($this->filterGroup)){
+        }
+        if (empty($this->filterGroup)) {
             throw new Exception('You must specify a filter.');
-        }         
+        }
         return str_replace("**USERNAME**", $username, $this->filterGroup);
     }
 
