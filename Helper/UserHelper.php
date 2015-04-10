@@ -40,6 +40,7 @@ class UserHelper {
     protected $mode;
     protected $baseDn;
     protected $filterUser;
+    protected $filterAllUser;
     protected $filterGroup;
     protected $verbose;
     protected $adminId;
@@ -51,7 +52,7 @@ class UserHelper {
     protected $groupEzName;
     protected $posEz;
 
-    public function __construct(Repository $repository, $kernel, UserService $userService, LdapConnection $ldapService, Logger $logger, $groupLdapLocationId, $groupLdapContentId, $password, $fieldsUserLdap, $fieldsUserEz, $fieldsGroupLdap, $fieldsGroupEz, $mode, $baseDn, $filterUser, $filterGroup, $verbose, $adminId) {
+    public function __construct(Repository $repository, $kernel, UserService $userService, LdapConnection $ldapService, Logger $logger, $groupLdapLocationId, $groupLdapContentId, $password, $fieldsUserLdap, $fieldsUserEz, $fieldsGroupLdap, $fieldsGroupEz, $mode, $baseDn, $filterUser,$filterAllUser, $filterGroup, $verbose, $adminId) {
         $this->repository = $repository;
         $this->kernel = $kernel;
         $this->userService = $userService;
@@ -67,6 +68,7 @@ class UserHelper {
         $this->mode = $mode;
         $this->baseDn = $baseDn;
         $this->filterUser = $filterUser;
+        $this->filterAllUser = $filterAllUser;
         $this->filterGroup = $filterGroup;
         $this->verbose = $verbose;
         $this->adminId = $adminId;
@@ -540,5 +542,36 @@ class UserHelper {
     protected function debug($var) {
         print "<pre>" . print_r($var, true) . "</pre>";
     }
+    
+    public function getAllUserLdap(){
+        
+        return $this->searchInfoAllUser();
+        
+    }
+    
+    /**
+     * Seeking a user's info in ldap
+     * @param type $username
+     * @return boolean
+     */
+    protected function searchInfoAllUser() {
 
+        try {
+            $ldapInfoUser = $this->ldapService->search(array(
+                'base_dn' => $this->baseDn,
+                'filter' => $this->filterAllUser,
+            ));
+        } catch (Exception $e) {
+            $this->err("searchInfoUser: " . $e->getMessage());
+            throw $e;
+        }
+
+        if ($ldapInfoUser['count'] == 0) {
+            throw new Exception('No LDAP account matching the search');
+        }
+        return $ldapInfoUser;
+    }
+
+
+    
 }

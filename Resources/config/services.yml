@@ -16,6 +16,7 @@ parameters:
     ow_synchronize_ldap_user.mode: update
     ow_synchronize_ldap_user.base_dn: dc=example,dc=com
     ow_synchronize_ldap_user.filter_user: '(&(objectclass=person)(uid=**USERNAME**))'
+    ow_synchronize_ldap_user.filter_all_user: '(&(objectclass=person))'
     ow_synchronize_ldap_user.filter_group: '(&(objectclass=groupOfUniqueNames)(uniquemember=uid=**USERNAME**,dc=example,dc=com))'
     ow_synchronize_ldap_user.verbose: false
     ow_synchronize_ldap_user.admin.id: 14
@@ -41,6 +42,7 @@ services:
           - %ow_synchronize_ldap_user.mode%
           - %ow_synchronize_ldap_user.base_dn%
           - %ow_synchronize_ldap_user.filter_user%
+          - %ow_synchronize_ldap_user.filter_all_user%
           - %ow_synchronize_ldap_user.filter_group%
           - %ow_synchronize_ldap_user.verbose%
           - %ow_synchronize_ldap_user.admin.id%

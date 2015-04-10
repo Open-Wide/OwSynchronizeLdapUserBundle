@@ -52,6 +52,7 @@ class LdapSecuritySubscriber implements EventSubscriberInterface {
      * @param InteractiveLoginEvent $event
      */
     public function onInteractiveLogin(InteractiveLoginEvent $event) {
+
         if ($this->getUsername() != "") {
             $this->info("LdapSecuritySubscriber event onInteractiveLogin : ".$this->getUsername()); 
             
