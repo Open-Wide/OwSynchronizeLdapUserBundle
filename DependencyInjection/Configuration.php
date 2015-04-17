@@ -55,7 +55,8 @@ class Configuration implements ConfigurationInterface {
                             ->scalarNode('base_dn')->defaultValue('dc=example,dc=com')->end()
                             ->scalarNode('filter_user')->defaultValue('(&(objectclass=person)(uid=**USERNAME**))')->end()
                             ->scalarNode('filter_all_user')->defaultValue('(&(objectclass=person))')->end()
-                            ->scalarNode('filter_group')->defaultValue('(&(objectclass=groupOfUniqueNames)(uniquemember=uid=**USERNAME**,dc=example,dc=com))')->end()
+                            ->scalarNode('filter_member_of')->defaultValue(' ')->end()
+                            ->scalarNode('field_member_of')->defaultValue('memberof')->end()
                         ->end()
                     ->end()
                 ->end();

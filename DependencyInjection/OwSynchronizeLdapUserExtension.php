@@ -31,7 +31,8 @@ class OwSynchronizeLdapUserExtension extends Extension
             $container->setParameter('ow_synchronize_ldap_user.base_dn', $config['ldap']['base_dn']);
             $container->setParameter('ow_synchronize_ldap_user.filter_user', $config['ldap']['filter_user']);
             $container->setParameter('ow_synchronize_ldap_user.filter_all_user', $config['ldap']['filter_all_user']);
-            $container->setParameter('ow_synchronize_ldap_user.filter_group', $config['ldap']['filter_group']);
+            $container->setParameter('ow_synchronize_ldap_user.filter_member_of', $config['ldap']['filter_member_of']);
+            $container->setParameter('ow_synchronize_ldap_user.field_member_of', $config['ldap']['field_member_of']);
             
             $userFieldsLdap = $userFieldsEz = array();
             foreach( $config['fields']['user'] as $key => $field ){

@@ -41,10 +41,12 @@ class UserHelper {
     protected $baseDn;
     protected $filterUser;
     protected $filterAllUser;
-    protected $filterGroup;
+    protected $filterMemberOf;
+    protected $fieldMemberOf;
     protected $verbose;
     protected $adminId;
     protected $infoUserLdap;
+    protected $infoUserLdapOrigin;
     protected $infoGroupLdap;
     protected $infoGroupLdapWithoutArray;
     protected $APIuser;
@@ -52,7 +54,7 @@ class UserHelper {
     protected $groupEzName;
     protected $posEz;
 
-    public function __construct(Repository $repository, $kernel, UserService $userService, LdapConnection $ldapService, Logger $logger, $groupLdapLocationId, $groupLdapContentId, $password, $fieldsUserLdap, $fieldsUserEz, $fieldsGroupLdap, $fieldsGroupEz, $mode, $baseDn, $filterUser,$filterAllUser, $filterGroup, $verbose, $adminId) {
+    public function __construct(Repository $repository, $kernel, UserService $userService, LdapConnection $ldapService, Logger $logger, $groupLdapLocationId, $groupLdapContentId, $password, $fieldsUserLdap, $fieldsUserEz, $fieldsGroupLdap, $fieldsGroupEz, $mode, $baseDn, $filterUser,$filterAllUser, $filterMemberOf,$fieldMemberOf, $verbose, $adminId) {
         $this->repository = $repository;
         $this->kernel = $kernel;
         $this->userService = $userService;
@@ -69,7 +71,8 @@ class UserHelper {
         $this->baseDn = $baseDn;
         $this->filterUser = $filterUser;
         $this->filterAllUser = $filterAllUser;
-        $this->filterGroup = $filterGroup;
+        $this->filterMemberOf = $filterMemberOf;
+        $this->fieldMemberOf = $fieldMemberOf;
         $this->verbose = $verbose;
         $this->adminId = $adminId;
     }
@@ -87,6 +90,13 @@ class UserHelper {
 
             $this->searchInfo($username);
 
+            $this->debug($this->infoUserLdap);
+            $this->debug($this->infoGroupLdap);
+            $this->debug($this->infoGroupLdapWithoutArray);
+            
+            
+
+
             $parentGroup = $this->userService->loadUserGroup($this->groupLdapContentId);
 
             if (!($user = $this->findUserByDn($this->infoUserLdap['dn']))) {
@@ -103,6 +113,7 @@ class UserHelper {
             $this->findGroupEz();
             $this->addGroups($this->groupEzName, $this->infoGroupLdap);
             $this->findGroupEz();
+
             $this->findMultiPositionEz($this->APIuser);
             $this->addMissingPositions($this->infoGroupLdapWithoutArray, $this->posEzName);
             $this->deleteTooPosition($this->posEzName, $this->infoGroupLdapWithoutArray);
@@ -138,24 +149,26 @@ class UserHelper {
      */
     protected function searchInfoUser($username) {
 
-        try {
-            $ldapInfoUser = $this->ldapService->search(array(
+        /*try {
+            $this->infoUserLdapOrigin = $this->ldapService->search(array(
                 'base_dn' => $this->baseDn,
                 'filter' => $this->getFilterUser($username),
             ));
         } catch (Exception $e) {
             $this->err("searchInfoUser: " . $e->getMessage());
             throw $e;
-        }
+        }*/
 
-        if ($ldapInfoUser['count'] == 0) {
+        $this->infoUserLdapOrigin = $this->getValueTest();
+        
+        if ($this->infoUserLdapOrigin['count'] == 0) {
             throw new Exception('No LDAP account matching the search');
         }
-        if ($ldapInfoUser['count'] > 1) {
+        if ($this->infoUserLdapOrigin['count'] > 1) {
             throw new Exception('More than one LDAP account match the search');
         }
         $this->info("Authentification de " . $username);
-        return $this->getInfoUser($ldapInfoUser);
+        return $this->getInfoUser($this->infoUserLdapOrigin);
     }
 
     /**
@@ -165,12 +178,22 @@ class UserHelper {
      */
     protected function searchGroupUser($username) {
         try {
-            $ldapInfoGroup = $this->ldapService->search(array(
-                'base_dn' => $this->baseDn,
-                'filter' => $this->getFilterGroup($username),
-            ));
+            $groupUser  =array();
+            if(is_array($this->infoUserLdapOrigin) && isset($this->infoUserLdapOrigin['count']) && isset($this->infoUserLdapOrigin[0][$this->fieldMemberOf])){
+                foreach($this->infoUserLdapOrigin[0][$this->fieldMemberOf] as $key => $value){
+                    if($key != "count"){
+                        if(strstr($value, $this->filterMemberOf)){
+                            $groupUser[] =  array(
+                                'name' => substr($value,3, (strlen($this->filterMemberOf)+1) * (-1) ),
+                                'dn'   => $value
+                                
+                            );
+                        }
+                    }
+                }
+            }
 
-            return $this->getInfoGroup($ldapInfoGroup);
+            return $groupUser;
         } catch (Exception $e) {
             $this->err("searchGroupUser: " . $e->getMessage());
             throw $e;
@@ -194,29 +217,13 @@ class UserHelper {
 
     /**
      * Formating info group ldap
-     * @param type $infoGroupLdap
-     * @return type
-     */
-    protected function getInfoGroup($infoGroupLdap) {
-        $fields = array_unique($this->fieldsGroupLdap);
-        $liste = array();
-        for ($i = 0; $i < $infoGroupLdap['count']; $i++) {
-            foreach ($fields as $field) {
-                $liste[$i][$field] = $this->getFieldLdap($infoGroupLdap, $i, $field);
-            }
-        }
-        return $liste;
-    }
-
-    /**
-     * Formating info group ldap
      * @param type $infoGroup
      * @return type
      */
     protected function getInfoGroupWithoutArray($infoGroup) {
         $liste = array();
         foreach ($infoGroup as $group) {
-            $liste[] = $group['ou'];
+            $liste[] = $group['cn'];
         }
         return $liste;
     }
@@ -231,7 +238,7 @@ class UserHelper {
     protected function getFieldLdap($infoLdap, $index, $field) {
         if (isset($infoLdap[$index][$field])) {
             if ($field == "dn") {
-                return $infoLdap[$index][$field];
+                return $infoLdap[$index][$field][0];
             } else {
                 return $infoLdap[$index][$field][0];
             }
@@ -382,11 +389,14 @@ class UserHelper {
         if (!is_array($groupLdap)) {
             throw new Exception('Ldap groups must be an array.');
         }
-
+        $this->debug($groupLdap);
+        $this->debug($groupEz);
+        exit();
         try {
             foreach ($groupLdap as $group) {
-                if (!in_array($group['ou'], $groupEz)) {
-                    $this->info("Creating a new user group : " . $group['ou']);
+
+            if (!in_array($group['cn'], $groupEz)) {
+                    $this->info("Creating a new user group : " . $group['cn']);
                     $this->newUserGroup($group);
                 } else {
                     $this->info("The " . $group['ou'] . " group already exists.");
@@ -573,5 +583,138 @@ class UserHelper {
     }
 
 
+    private function getValueTest(){
+        return array(
+            'count'=>1,
+            '0' => array(
+                
+                'objectclass'=> array(
+                    'count'=> 4,
+                    '0'=>'top',
+                    '1'=>'person',
+                    '2'=>'organizationalPerson',
+                    '3'=>'user',
+                ),
+                '0' => 'objectclass',
+                
+                'cn'=> array(
+                    'count'=> 1,
+                    '0'=>'DEDE Jack',
+                ),
+                '1' => 'cn',
+                
+                'sn'=> array(
+                    'count'=> 1,
+                    '0'=>'DEDE',
+                ),
+                '2' => 'sn',
+
+                'postofficebox'=> array(
+                    'count'=> 1,
+                    '0'=>'22222',
+                ),
+                '3' => 'postofficebox',
+                'givenname'=> array(
+                    'count'=> 1,
+                    '0'=>'Jack',
+                ),
+                '4' => 'givenname',
+                'distinguishedname'=> array(
+                    'count'=> 1,
+                    '0'=>'CN=DEDE Jack,OU=Utilisateurs,OU=CG85,DC=cg85,DC=fr',
+                ),
+                '5' => 'distinguishedname',
+                'instancetype'=> array(
+                    'count'=> 1,
+                    '0'=>4,
+                ),
+                '6' => 'instancetype',
+                'displayname'=> array(
+                    'count'=> 1,
+                    '0'=>'DEDE Jack',
+                ),
+                '7' => 'displayname',
+                'memberof'=> array(
+                    'count'=> 3,
+                    '0'=>'CN=intranet,OU=Droits INTRANET,OU=Groupes Applications,OU=Groupes,OU=CG85,DC=cg85,DC=fr',
+                    '1'=>'CN=intranet.contributeur,OU=Droits INTRANET,OU=Groupes Applications,OU=Groupes,OU=CG85,DC=cg85,DC=fr',
+                    '2'=>'CN=intranet.di,OU=Droits INTRANET,OU=Groupes Applications,OU=Groupes,OU=CG85,DC=cg85,DC=fr',
+                ),
+                '8' => 'memberof',
+                'dn'=> array(
+                    'count'=> 1,
+                    '0'=>'CN=DEDE Jack,OU=Utilisateurs,OU=CG85,DC=cg85,DC=fr',
+                ),
+                '9' => 'dn',
+                'mail'=> array(
+                    'count'=> 1,
+                    '0'=>'jack.dede@vendee.fr',
+                ),
+                '10' => 'mail',
+                'extensionAttribute12'=> array(
+                    'count'=> 1,
+                    '0'=>'extensionAttribute12',
+                ),
+                '11' => 'extensionAttribute12',
+                'extensionAttribute13'=> array(
+                    'count'=> 1,
+                    '0'=>'extensionAttribute13',
+                ),
+                '12' => 'extensionAttribute13',
+                'extensionAttribute14'=> array(
+                    'count'=> 1,
+                    '0'=>'extensionAttribute14',
+                ),
+                '13' => 'extensionAttribute14',
+                'extensionAttribute15'=> array(
+                    'count'=> 1,
+                    '0'=>'extensionAttribute15',
+                ),
+                '14' => 'extensionAttribute15',
+
+                'l'=> array(
+                    'count'=> 1,
+                    '0'=>'lyon',
+                ),
+                '15' => 'l',
+                'othertelephone'=> array(
+                    'count'=> 1,
+                    '0'=>'othertelephone',
+                ),
+                '16' => 'othertelephone',
+                'physicaldeliveryofficename'=> array(
+                    'count'=> 1,
+                    '0'=>'physicaldeliveryofficename',
+                ),
+                '17' => 'physicaldeliveryofficename',
+                'postalcode'=> array(
+                    'count'=> 1,
+                    '0'=>'69100',
+                ),
+                '18' => 'postalcode',
+                'streetaddress'=> array(
+                    'count'=> 1,
+                    '0'=>'6 avenue Salvador allede',
+                ),
+                '19' => 'streetaddress',
+                'telephoneNumber'=> array(
+                    'count'=> 1,
+                    '0'=>'7896451565',
+                ),
+                '14' => 'telephoneNumber',
+                'title'=> array(
+                    'count'=> 1,
+                    '0'=>'06774125896',
+                ),
+                '14' => 'title',
+                'samaccountname'=> array(
+                    'count'=> 1,
+                    '0'=>'dedejack',
+                ),
+                '14' => 'samaccountname',
+            )
+            
+        );
+    }
     
 }
