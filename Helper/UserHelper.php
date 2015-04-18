@@ -83,20 +83,13 @@ class UserHelper {
      * @return type
      */
     public function synchronizeUserAndGroup($username) {
-
+        
         try {
             $userAdmin = $this->userService->loadUser($this->adminId);
             $this->repository->setCurrentUser($userAdmin);
 
             $this->searchInfo($username);
-
-            $this->debug($this->infoUserLdap);
-            $this->debug($this->infoGroupLdap);
-            $this->debug($this->infoGroupLdapWithoutArray);
             
-            
-
-
             $parentGroup = $this->userService->loadUserGroup($this->groupLdapContentId);
 
             if (!($user = $this->findUserByDn($this->infoUserLdap['dn']))) {
@@ -113,7 +106,7 @@ class UserHelper {
             $this->findGroupEz();
             $this->addGroups($this->groupEzName, $this->infoGroupLdap);
             $this->findGroupEz();
-
+            
             $this->findMultiPositionEz($this->APIuser);
             $this->addMissingPositions($this->infoGroupLdapWithoutArray, $this->posEzName);
             $this->deleteTooPosition($this->posEzName, $this->infoGroupLdapWithoutArray);
@@ -223,7 +216,7 @@ class UserHelper {
     protected function getInfoGroupWithoutArray($infoGroup) {
         $liste = array();
         foreach ($infoGroup as $group) {
-            $liste[] = $group['cn'];
+            $liste[] = $group['name'];
         }
         return $liste;
     }
@@ -389,17 +382,15 @@ class UserHelper {
         if (!is_array($groupLdap)) {
             throw new Exception('Ldap groups must be an array.');
         }
-        $this->debug($groupLdap);
-        $this->debug($groupEz);
-        exit();
+
         try {
             foreach ($groupLdap as $group) {
 
-            if (!in_array($group['cn'], $groupEz)) {
-                    $this->info("Creating a new user group : " . $group['cn']);
+            if (!in_array($group['name'], $groupEz)) {
+                    $this->info("Creating a new user group : " . $group['dn']);
                     $this->newUserGroup($group);
                 } else {
-                    $this->info("The " . $group['ou'] . " group already exists.");
+                    $this->info("The " . $group['dn'] . " group already exists.");
                 }
             }
         } catch (Exception $e) {
@@ -445,6 +436,7 @@ class UserHelper {
 
         $positions = array();
         $positionsName = array();
+        
         foreach ($posEzs as $content) {
             if ($content->id != $this->groupLdapContentId) {
                 $positions[] = $content;
@@ -461,7 +453,9 @@ class UserHelper {
      * @param type $posEzName
      */
     protected function addMissingPositions($infoGroupLdapWithoutArray, $posEzName) {
+        
         $positionManquantes = array_diff($infoGroupLdapWithoutArray, $posEzName);
+        
         if (is_array($positionManquantes) && count($positionManquantes) > 0) {
             foreach ($positionManquantes as $positionManquante) {
                 foreach ($this->groupEz as $groupEz) {

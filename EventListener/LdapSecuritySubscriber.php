@@ -57,7 +57,7 @@ class LdapSecuritySubscriber implements EventSubscriberInterface {
             $this->info("LdapSecuritySubscriber event onInteractiveLogin : ".$this->getUsername()); 
             
             if($this->synchronize){
-                $this->setUsername('jdede');
+
                 if($this->userHelper->synchronizeUserAndGroup($this->getUsername())){
                     $event->setApiUser($this->userService->loadUserByLogin($this->getUsername()));
                 }
@@ -89,8 +89,7 @@ class LdapSecuritySubscriber implements EventSubscriberInterface {
      * @return type
      */
     public function getUsername() {
-        //return $this->username;
-        return "jdede"; 
+        return $this->username;
     }
 
     /**
