@@ -142,7 +142,7 @@ class UserHelper {
      */
     protected function searchInfoUser($username) {
 
-        /*try {
+        try {
             $this->infoUserLdapOrigin = $this->ldapService->search(array(
                 'base_dn' => $this->baseDn,
                 'filter' => $this->getFilterUser($username),
@@ -150,9 +150,9 @@ class UserHelper {
         } catch (Exception $e) {
             $this->err("searchInfoUser: " . $e->getMessage());
             throw $e;
-        }*/
-
-        $this->infoUserLdapOrigin = $this->getValueTest();
+        }
+        //For test if non connexion width ldap 
+        //$this->infoUserLdapOrigin = $this->getValueTest();
         
         if ($this->infoUserLdapOrigin['count'] == 0) {
             throw new Exception('No LDAP account matching the search');
@@ -576,7 +576,10 @@ class UserHelper {
         return $ldapInfoUser;
     }
 
-
+    /**
+     * test value 
+     * @return type
+     */
     private function getValueTest(){
         return array(
             'count'=>1,
