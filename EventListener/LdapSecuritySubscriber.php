@@ -52,22 +52,28 @@ class LdapSecuritySubscriber implements EventSubscriberInterface {
      * @param InteractiveLoginEvent $event
      */
     public function onInteractiveLogin(InteractiveLoginEvent $event) {
-
-        if ($this->getUsername() != "") {
-            $this->info("LdapSecuritySubscriber event onInteractiveLogin : ".$this->getUsername()); 
+        $username = $event->getAuthenticationToken()->getUsername();
+        
+        if ($username != "") {
+            $this->info("LdapSecuritySubscriber event onInteractiveLogin : ".$username); 
             
             if($this->synchronize){
-
-                if($this->userHelper->synchronizeUserAndGroup($this->getUsername())){
-                    $event->setApiUser($this->userService->loadUserByLogin($this->getUsername()));
+                if($this->userHelper->synchronizeUserAndGroup($username)){
+                    $event->setApiUser($this->userService->loadUserByLogin($username));
+                }else{
+                    // @ TOTO DECONNEXION
                 }
             }else{
                 if(isset($this->defaultUser) && !empty($this->defaultUser)){
                     $event->setApiUser($this->userService->loadUserByLogin($this->defaultUser));
                 }else{
-                    $event->setApiUser($this->userService->loadUserByLogin($this->getUsername()));
+                    $event->setApiUser($this->userService->loadUserByLogin($username));
                 }
             }
+        }else{
+            
+            // @TOTO DECONNEXION
+            
         }
     }
 
@@ -78,26 +84,7 @@ class LdapSecuritySubscriber implements EventSubscriberInterface {
     public function onPostBind(LdapUserEvent $event) {
         /* @var $user \IMAG\LdapBundle\User\LdapUser */
         $user = $event->getUser();
-        if ($user->getUsername() != "") {
-            $this->info("SYNCHRONIZE :: LdapSecuritySubscriber event onPostBind : ".$user->getUsername()); 
-            $this->setUsername($user->getUsername());
-        }
-    }
-
-    /**
-     * 
-     * @return type
-     */
-    public function getUsername() {
-        return $this->username;
-    }
-
-    /**
-     * 
-     * @param type $username
-     */
-    public function setUsername($username) {
-        $this->username = $username;
+        $this->info("SYNCHRONIZE :: LdapSecuritySubscriber event onPostBind : ".$user->getUsername()); 
     }
 
     /**
