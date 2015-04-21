@@ -10,8 +10,7 @@ use IMAG\LdapBundle\Event\LdapEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Ow\SynchronizeLdapUserBundle\Helper\UserHelper;
 use Monolog\Logger;
-
-
+use Symfony\Component\Security\Core\Exception\DisabledException;
 /**
  * Performs logic before the user is found to LDAP
  */
@@ -26,12 +25,11 @@ class LdapSecuritySubscriber implements EventSubscriberInterface {
      * @var $userHelper \Ow\SynchronizeLdapUserBundle\Helper\UserHelper
      */
     private $userHelper;
-    private $username;
     private $logger;
     private $synchronize;
     private $defaultUser;
 
-    public function __construct(UserService $userService, UserHelper $userHelper, $synchronize,$defaultUser, Logger $logger) {
+    public function __construct(UserService $userService, UserHelper $userHelper, $synchronize, $defaultUser, Logger $logger) {
         $this->userService = $userService;
         $this->userHelper = $userHelper;
         $this->synchronize = $synchronize;
@@ -53,27 +51,24 @@ class LdapSecuritySubscriber implements EventSubscriberInterface {
      */
     public function onInteractiveLogin(InteractiveLoginEvent $event) {
         $username = $event->getAuthenticationToken()->getUsername();
-        
         if ($username != "") {
-            $this->info("LdapSecuritySubscriber event onInteractiveLogin : ".$username); 
-            
-            if($this->synchronize){
-                if($this->userHelper->synchronizeUserAndGroup($username)){
+            $this->info("LdapSecuritySubscriber event onInteractiveLogin : " . $username);
+
+            if ($this->synchronize) {
+                if ($this->userHelper->synchronizeUserAndGroup($username)) {
                     $event->setApiUser($this->userService->loadUserByLogin($username));
-                }else{
-                    // @ TOTO DECONNEXION
+                } else {
+                    throw new DisabledException();
                 }
-            }else{
-                if(isset($this->defaultUser) && !empty($this->defaultUser)){
+            } else {
+                if (isset($this->defaultUser) && !empty($this->defaultUser)) {
                     $event->setApiUser($this->userService->loadUserByLogin($this->defaultUser));
-                }else{
+                } else {
                     $event->setApiUser($this->userService->loadUserByLogin($username));
                 }
             }
-        }else{
-            
-            // @TOTO DECONNEXION
-            
+        } else {
+            throw new DisabledException();
         }
     }
 
@@ -84,7 +79,7 @@ class LdapSecuritySubscriber implements EventSubscriberInterface {
     public function onPostBind(LdapUserEvent $event) {
         /* @var $user \IMAG\LdapBundle\User\LdapUser */
         $user = $event->getUser();
-        $this->info("SYNCHRONIZE :: LdapSecuritySubscriber event onPostBind : ".$user->getUsername()); 
+        $this->info("SYNCHRONIZE :: LdapSecuritySubscriber event onPostBind : " . $user->getUsername());
     }
 
     /**
@@ -96,6 +91,7 @@ class LdapSecuritySubscriber implements EventSubscriberInterface {
             $this->logger->info($message);
         }
     }
+
     /**
      * Log un message de type ERREUR
      * @param type $message
@@ -105,4 +101,5 @@ class LdapSecuritySubscriber implements EventSubscriberInterface {
             $this->logger->err($message);
         }
     }
+
 }

@@ -152,7 +152,7 @@ class UserHelper {
             throw $e;
         }
         //For test if non connexion width ldap 
-        //$this->infoUserLdapOrigin = $this->getValueTest();
+        //$this->infoUserLdapOrigin = $this->getValueTest($username);
         
         if ($this->infoUserLdapOrigin['count'] == 0) {
             throw new Exception('No LDAP account matching the search');
@@ -184,6 +184,10 @@ class UserHelper {
                         }
                     }
                 }
+            }
+            
+            if(count($groupUser)==0){
+                throw new Exception('The user must be linked to a group.');
             }
 
             return $groupUser;
@@ -580,7 +584,8 @@ class UserHelper {
      * test value 
      * @return type
      */
-    private function getValueTest(){
+    private function getValueTest($username){
+        if($username=="gauss")
         return array(
             'count'=>1,
             '0' => array(
@@ -645,7 +650,7 @@ class UserHelper {
                 '9' => 'dn',
                 'mail'=> array(
                     'count'=> 1,
-                    '0'=>'jack.dede@vendee.fr',
+                    '0'=>'jack.dede@test.fr',
                 ),
                 '10' => 'mail',
                 'extensionAttribute12'=> array(
@@ -712,6 +717,141 @@ class UserHelper {
             )
             
         );
+        
+        
+        else
+        return array(
+            'count'=>1,
+            '0' => array(
+                
+                'objectclass'=> array(
+                    'count'=> 4,
+                    '0'=>'top',
+                    '1'=>'person',
+                    '2'=>'organizationalPerson',
+                    '3'=>'user',
+                ),
+                '0' => 'objectclass',
+                
+                'cn'=> array(
+                    'count'=> 1,
+                    '0'=>'Newton Boby',
+                ),
+                '1' => 'cn',
+                
+                'sn'=> array(
+                    'count'=> 1,
+                    '0'=>'Newton',
+                ),
+                '2' => 'sn',
+
+                'postofficebox'=> array(
+                    'count'=> 1,
+                    '0'=>'22222',
+                ),
+                '3' => 'postofficebox',
+                'givenname'=> array(
+                    'count'=> 1,
+                    '0'=>'Boby',
+                ),
+                '4' => 'givenname',
+                'distinguishedname'=> array(
+                    'count'=> 1,
+                    '0'=>'CN=Newton Boby,OU=Utilisateurs,OU=CG85,DC=cg85,DC=fr',
+                ),
+                '5' => 'distinguishedname',
+                'instancetype'=> array(
+                    'count'=> 1,
+                    '0'=>4,
+                ),
+                '6' => 'instancetype',
+                'displayname'=> array(
+                    'count'=> 1,
+                    '0'=>'Newton Boby',
+                ),
+                '7' => 'displayname',
+                'memberof'=> array(
+                    'count'=> 3,
+                    '0'=>'CN=intranet,OU=Droits INTRANET,OU=Groupes Applications,OU=Groupes,OU=CG85,DC=cg85,DC=fr',
+                    '1'=>'CN=intranet.testeur,OU=Droits INTRANET,OU=Groupes Applications,OU=Groupes,OU=CG85,DC=cg85,DC=fr',
+                    '2'=>'CN=intranet.di,OU=Droits INTRANET,OU=Groupes Applications,OU=Groupes,OU=CG85,DC=cg85,DC=fr',
+                ),
+                '8' => 'memberof',
+                'dn'=> array(
+                    'count'=> 1,
+                    '0'=>'CN=Newton Boby,OU=Utilisateurs,OU=CG85,DC=cg85,DC=fr',
+                ),
+                '9' => 'dn',
+                'mail'=> array(
+                    'count'=> 1,
+                    '0'=>'boby.newton@test.fr',
+                ),
+                '10' => 'mail',
+                'extensionAttribute12'=> array(
+                    'count'=> 1,
+                    '0'=>'extensionAttribute12',
+                ),
+                '11' => 'extensionAttribute12',
+                'extensionAttribute13'=> array(
+                    'count'=> 1,
+                    '0'=>'extensionAttribute13',
+                ),
+                '12' => 'extensionAttribute13',
+                'extensionAttribute14'=> array(
+                    'count'=> 1,
+                    '0'=>'extensionAttribute14',
+                ),
+                '13' => 'extensionAttribute14',
+                'extensionAttribute15'=> array(
+                    'count'=> 1,
+                    '0'=>'extensionAttribute15',
+                ),
+                '14' => 'extensionAttribute15',
+
+                'l'=> array(
+                    'count'=> 1,
+                    '0'=>'lyon',
+                ),
+                '15' => 'l',
+                'othertelephone'=> array(
+                    'count'=> 1,
+                    '0'=>'othertelephone',
+                ),
+                '16' => 'othertelephone',
+                'physicaldeliveryofficename'=> array(
+                    'count'=> 1,
+                    '0'=>'physicaldeliveryofficename',
+                ),
+                '17' => 'physicaldeliveryofficename',
+                'postalcode'=> array(
+                    'count'=> 1,
+                    '0'=>'69100',
+                ),
+                '18' => 'postalcode',
+                'streetaddress'=> array(
+                    'count'=> 1,
+                    '0'=>'6 avenue Salvador allede',
+                ),
+                '19' => 'streetaddress',
+                'telephoneNumber'=> array(
+                    'count'=> 1,
+                    '0'=>'7896451565',
+                ),
+                '14' => 'telephoneNumber',
+                'title'=> array(
+                    'count'=> 1,
+                    '0'=>'06774125896',
+                ),
+                '14' => 'title',
+                'samaccountname'=> array(
+                    'count'=> 1,
+                    '0'=>'newton',
+                ),
+                '14' => 'samaccountname',
+            )
+            
+        );
+        
     }
     
 }
