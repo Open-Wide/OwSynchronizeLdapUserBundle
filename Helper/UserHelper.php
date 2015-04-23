@@ -92,7 +92,7 @@ class UserHelper {
             
             $parentGroup = $this->userService->loadUserGroup($this->groupLdapContentId);
 
-            if (!($user = $this->findUserByDn($this->infoUserLdap['dn']))) {
+            if (!($user = $this->findUserByDn($this->infoUserLdap['distinguishedname']))) {
                 $this->APIuser = $this->newUser(array($parentGroup), $username, $this->password, "fre-FR", $this->infoUserLdap);
                 $this->info("Add user EZ " . $username);
             } else {
@@ -268,8 +268,8 @@ class UserHelper {
         $query = new Query();
         $query->filter = new Criterion\LogicalAnd($criteria);
         $searchResult = $this->repository->getSearchService()->findContent($query);
-
-        if (count($searchResult->searchHits) == 1) {
+        
+        if ( $searchResult->totalCount == 1) {
             return $searchResult->searchHits[0]->valueObject;
         } else {
             return false;
@@ -308,10 +308,10 @@ class UserHelper {
     protected function newUser($parentContentIds = array(), $userName, $password = "", $mainLanguageCode = "fre-FR", $fields) {
         try {
             $newUserCreateStruct = $this->userService->newUserCreateStruct($userName, $fields['mail'], $password, $mainLanguageCode, $contentType = null);
-
             foreach ($this->fieldsUserLdap as $key => $value) {
                 $newUserCreateStruct->setField($this->fieldsUserEz[$key], $fields[$value]);
             }
+            
             return $this->userService->createUser($newUserCreateStruct, $parentContentIds);
         } catch (Exception $e) {
             $this->err("Unable to create new user : " . $e->getMessage());
@@ -643,36 +643,31 @@ class UserHelper {
                     '2'=>'CN=intranet.di,OU=Droits INTRANET,OU=Groupes Applications,OU=Groupes,OU=CG85,DC=cg85,DC=fr',
                 ),
                 '8' => 'memberof',
-                'dn'=> array(
-                    'count'=> 1,
-                    '0'=>'CN=DEDE Jack,OU=Utilisateurs,OU=CG85,DC=cg85,DC=fr',
-                ),
-                '9' => 'dn',
                 'mail'=> array(
                     'count'=> 1,
                     '0'=>'jack.dede@test.fr',
                 ),
                 '10' => 'mail',
-                'extensionAttribute12'=> array(
+                'extensionattribute12'=> array(
                     'count'=> 1,
-                    '0'=>'extensionAttribute12',
+                    '0'=>'extensionattribute12',
                 ),
-                '11' => 'extensionAttribute12',
-                'extensionAttribute13'=> array(
+                '11' => 'extensionattribute12',
+                'extensionattribute13'=> array(
                     'count'=> 1,
-                    '0'=>'extensionAttribute13',
+                    '0'=>'extensionattribute13',
                 ),
-                '12' => 'extensionAttribute13',
-                'extensionAttribute14'=> array(
+                '12' => 'extensionattribute13',
+                'extensionattribute14'=> array(
                     'count'=> 1,
-                    '0'=>'extensionAttribute14',
+                    '0'=>'extensionattribute14',
                 ),
-                '13' => 'extensionAttribute14',
-                'extensionAttribute15'=> array(
+                '13' => 'extensionattribute14',
+                'extensionattribute15'=> array(
                     'count'=> 1,
-                    '0'=>'extensionAttribute15',
+                    '0'=>'extensionattribute15',
                 ),
-                '14' => 'extensionAttribute15',
+                '14' => 'extensionattribute15',
 
                 'l'=> array(
                     'count'=> 1,
@@ -699,22 +694,27 @@ class UserHelper {
                     '0'=>'6 avenue Salvador allede',
                 ),
                 '19' => 'streetaddress',
-                'telephoneNumber'=> array(
+                'telephonenumber'=> array(
                     'count'=> 1,
                     '0'=>'7896451565',
                 ),
-                '14' => 'telephoneNumber',
+                '20' => 'telephonenumber',
                 'title'=> array(
                     'count'=> 1,
                     '0'=>'06774125896',
                 ),
-                '14' => 'title',
+                '21' => 'title',
                 'samaccountname'=> array(
                     'count'=> 1,
                     '0'=>'dedejack',
                 ),
-                '14' => 'samaccountname',
-            )
+                '22' => 'samaccountname',
+                'employeeid'=> array(
+                    'count'=> 1,
+                    '0'=>'2001',
+                ),
+                '23' => 'employeeid',
+             )
             
         );
         
@@ -777,36 +777,31 @@ class UserHelper {
                     '2'=>'CN=intranet.di,OU=Droits INTRANET,OU=Groupes Applications,OU=Groupes,OU=CG85,DC=cg85,DC=fr',
                 ),
                 '8' => 'memberof',
-                'dn'=> array(
-                    'count'=> 1,
-                    '0'=>'CN=Newton Boby,OU=Utilisateurs,OU=CG85,DC=cg85,DC=fr',
-                ),
-                '9' => 'dn',
                 'mail'=> array(
                     'count'=> 1,
                     '0'=>'boby.newton@test.fr',
                 ),
                 '10' => 'mail',
-                'extensionAttribute12'=> array(
+                'extensionattribute12'=> array(
                     'count'=> 1,
-                    '0'=>'extensionAttribute12',
+                    '0'=>'extensionattribute12',
                 ),
-                '11' => 'extensionAttribute12',
+                '11' => 'extensionattribute12',
                 'extensionAttribute13'=> array(
                     'count'=> 1,
-                    '0'=>'extensionAttribute13',
+                    '0'=>'extensionattribute13',
                 ),
-                '12' => 'extensionAttribute13',
+                '12' => 'extensionattribute13',
                 'extensionAttribute14'=> array(
                     'count'=> 1,
-                    '0'=>'extensionAttribute14',
+                    '0'=>'extensionattribute14',
                 ),
-                '13' => 'extensionAttribute14',
+                '13' => 'extensionattribute14',
                 'extensionAttribute15'=> array(
                     'count'=> 1,
-                    '0'=>'extensionAttribute15',
+                    '0'=>'extensionattribute15',
                 ),
-                '14' => 'extensionAttribute15',
+                '14' => 'extensionattribute15',
 
                 'l'=> array(
                     'count'=> 1,
@@ -837,17 +832,22 @@ class UserHelper {
                     'count'=> 1,
                     '0'=>'7896451565',
                 ),
-                '14' => 'telephoneNumber',
+                '20' => 'telephonenumber',
                 'title'=> array(
                     'count'=> 1,
                     '0'=>'06774125896',
                 ),
-                '14' => 'title',
+                '21' => 'title',
                 'samaccountname'=> array(
                     'count'=> 1,
                     '0'=>'newton',
                 ),
-                '14' => 'samaccountname',
+                '22' => 'samaccountname',
+                'employeeid'=> array(
+                    'count'=> 1,
+                    '0'=>'2004',
+                ),
+                '23' => 'employeeid',
             )
             
         );
