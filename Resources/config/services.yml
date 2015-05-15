@@ -1,63 +1,63 @@
 parameters:
-    openwide_synchronize_ldap_user.ldap.parent_group.content_id: 223
-    openwide_synchronize_ldap_user.ldap.parent_group.location_id: 218
-    openwide_synchronize_ldap_user.ldap.user_password: dfSq56Qsd4Fsqf
-    openwide_synchronize_ldap_user.ldap.fields_user_ldap:
+    open_wide_synchronize_ldap_user.ldap.parent_group.content_id: 223
+    open_wide_synchronize_ldap_user.ldap.parent_group.location_id: 218
+    open_wide_synchronize_ldap_user.ldap.user_password: dfSq56Qsd4Fsqf
+    open_wide_synchronize_ldap_user.ldap.fields_user_ldap:
       - dn
-    openwide_synchronize_ldap_user.ldap.fields_user_ez: 
+    open_wide_synchronize_ldap_user.ldap.fields_user_ez: 
       - dn
-    openwide_synchronize_ldap_user.ldap.fields_group_ldap:
+    open_wide_synchronize_ldap_user.ldap.fields_group_ldap:
       - ou
-    openwide_synchronize_ldap_user.ldap.fields_group_ez: 
+    open_wide_synchronize_ldap_user.ldap.fields_group_ez: 
       - name
 
-    openwide_synchronize_ldap_user.post_event_subscriber_ldap.class: 'OpenWide\SynchronizeLdapUserBundle\EventListener\LdapSecuritySubscriber'
-    openwide_synchronize_ldap_user.user_helper.class: 'OpenWide\SynchronizeLdapUserBundle\Helper\UserHelper'
-    openwide_synchronize_ldap_user.mode: update
-    openwide_synchronize_ldap_user.base_dn: dc=example,dc=com
-    openwide_synchronize_ldap_user.filter_user: '(&(objectclass=person)(uid=**USERNAME**))'
-    openwide_synchronize_ldap_user.filter_all_user: '(&(objectclass=person))'
-    openwide_synchronize_ldap_user.filter_member_of: '(&(objectclass=groupOfUniqueNames)(uniquemember=uid=**USERNAME**,dc=example,dc=com))'
-    openwide_synchronize_ldap_user.field_member_of: 'memberof'
-    openwide_synchronize_ldap_user.verbose: false
-    openwide_synchronize_ldap_user.admin.id: 14
-    openwide_synchronize_ldap_user.synchronize: true
-    openwide_synchronize_ldap_user.default_user: ~
+    open_wide_synchronize_ldap_user.post_event_subscriber_ldap.class: 'OpenWide\SynchronizeLdapUserBundle\EventListener\LdapSecuritySubscriber'
+    open_wide_synchronize_ldap_user.user_helper.class: 'OpenWide\SynchronizeLdapUserBundle\Helper\UserHelper'
+    open_wide_synchronize_ldap_user.mode: update
+    open_wide_synchronize_ldap_user.base_dn: dc=example,dc=com
+    open_wide_synchronize_ldap_user.filter_user: '(&(objectclass=person)(uid=**USERNAME**))'
+    open_wide_synchronize_ldap_user.filter_all_user: '(&(objectclass=person))'
+    open_wide_synchronize_ldap_user.filter_member_of: '(&(objectclass=groupOfUniqueNames)(uniquemember=uid=**USERNAME**,dc=example,dc=com))'
+    open_wide_synchronize_ldap_user.field_member_of: 'memberof'
+    open_wide_synchronize_ldap_user.verbose: false
+    open_wide_synchronize_ldap_user.admin.id: 14
+    open_wide_synchronize_ldap_user.synchronize: true
+    open_wide_synchronize_ldap_user.default_user: ~
     
 services:
-    openwide_synchronize_ldap_user.user_helper:
-        class: %openwide_synchronize_ldap_user.user_helper.class%
+    open_wide_synchronize_ldap_user.user_helper:
+        class: %open_wide_synchronize_ldap_user.user_helper.class%
         arguments: 
           - @ezpublish.api.repository
           - @ezpublish_legacy.kernel
           - @ezpublish.api.service.user
           - @imag_ldap.ldap_connection
           - @logger
-          - %openwide_synchronize_ldap_user.ldap.parent_group.location_id%
-          - %openwide_synchronize_ldap_user.ldap.parent_group.content_id%
-          - %openwide_synchronize_ldap_user.ldap.user_password%
-          - %openwide_synchronize_ldap_user.ldap.fields_user_ldap%
-          - %openwide_synchronize_ldap_user.ldap.fields_user_ez%
-          - %openwide_synchronize_ldap_user.ldap.fields_group_ldap%
-          - %openwide_synchronize_ldap_user.ldap.fields_group_ez%
-          - %openwide_synchronize_ldap_user.mode%
-          - %openwide_synchronize_ldap_user.base_dn%
-          - %openwide_synchronize_ldap_user.filter_user%
-          - %openwide_synchronize_ldap_user.filter_all_user%
-          - %openwide_synchronize_ldap_user.filter_member_of%
-          - %openwide_synchronize_ldap_user.field_member_of%
-          - %openwide_synchronize_ldap_user.verbose%
-          - %openwide_synchronize_ldap_user.admin.id%
+          - %open_wide_synchronize_ldap_user.ldap.parent_group.location_id%
+          - %open_wide_synchronize_ldap_user.ldap.parent_group.content_id%
+          - %open_wide_synchronize_ldap_user.ldap.user_password%
+          - %open_wide_synchronize_ldap_user.ldap.fields_user_ldap%
+          - %open_wide_synchronize_ldap_user.ldap.fields_user_ez%
+          - %open_wide_synchronize_ldap_user.ldap.fields_group_ldap%
+          - %open_wide_synchronize_ldap_user.ldap.fields_group_ez%
+          - %open_wide_synchronize_ldap_user.mode%
+          - %open_wide_synchronize_ldap_user.base_dn%
+          - %open_wide_synchronize_ldap_user.filter_user%
+          - %open_wide_synchronize_ldap_user.filter_all_user%
+          - %open_wide_synchronize_ldap_user.filter_member_of%
+          - %open_wide_synchronize_ldap_user.field_member_of%
+          - %open_wide_synchronize_ldap_user.verbose%
+          - %open_wide_synchronize_ldap_user.admin.id%
         tags:
             - { name: monolog.logger, channel: synchronize }
 
-    openwide_synchronize_ldap_user.listener:
-        class: %openwide_synchronize_ldap_user.post_event_subscriber_ldap.class%
+    open_wide_synchronize_ldap_user.listener:
+        class: %open_wide_synchronize_ldap_user.post_event_subscriber_ldap.class%
         arguments: 
             - @ezpublish.api.service.user
-            - @openwide_synchronize_ldap_user.user_helper
-            - %openwide_synchronize_ldap_user.synchronize%
-            - %openwide_synchronize_ldap_user.default_user%
+            - @open_wide_synchronize_ldap_user.user_helper
+            - %open_wide_synchronize_ldap_user.synchronize%
+            - %open_wide_synchronize_ldap_user.default_user%
             - @logger
         tags:
             - { name: kernel.event_subscriber }
