@@ -1,6 +1,6 @@
 <?php
 
-namespace Ow\SynchronizeLdapUserBundle\EventListener;
+namespace OpenWide\SynchronizeLdapUserBundle\EventListener;
 
 use eZ\Publish\API\Repository\UserService;
 use eZ\Publish\Core\MVC\Symfony\Event\InteractiveLoginEvent;
@@ -8,7 +8,7 @@ use eZ\Publish\Core\MVC\Symfony\MVCEvents;
 use IMAG\LdapBundle\Event\LdapUserEvent;
 use IMAG\LdapBundle\Event\LdapEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Ow\SynchronizeLdapUserBundle\Helper\UserHelper;
+use OpenWide\SynchronizeLdapUserBundle\Helper\UserHelper;
 use Monolog\Logger;
 use Symfony\Component\Security\Core\Exception\DisabledException;
 /**

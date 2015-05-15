@@ -1,8 +1,9 @@
 {
-    "name": "ow/synchronizeldapuser-bundle",
+    "name": "open-wide/synchronizeldapuser-bundle",
     "description": "Synchronize Ldap User to Ezpublish 5.3 or newer",
     "homepage": "https://github.com/Open-Wide/SynchronizeLdapUserBundle",
     "license": "GPL-3.0+",
+    "keywords": ["ezpublish", "ldap", "imag/ldap-bundle"],
     "authors": [
         {
             "name": "Duc Nicolas for Open Wide",
@@ -18,8 +19,8 @@
         "imag/ldap-bundle": "master"
     },
     "autoload": {
-        "psr-0": { "Ow\\SynchronizeLdapUserBundle": "" }
+        "psr-0": { "OpenWide\\SynchronizeLdapUserBundle": "" }
     },
 
-    "target-dir": "Ow/SynchronizeLdapUserBundle"
+    "target-dir": "OpenWide/SynchronizeLdapUserBundle"
 }

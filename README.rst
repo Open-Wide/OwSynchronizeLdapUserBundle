@@ -1,11 +1,11 @@
 ====================================
-OwSynchronizeLdapUser for eZ Publish 
+OpenWideSynchronizeLdapUser for eZ Publish 
 ====================================
 
 .. image:: https://github.com/Open-Wide/OWNewsletter/raw/master/doc/images/Open-Wide_logo.png
     :align: center
 
-:Extension: OwSynchronizeLdapUser v1.0
+:Extension: OpenWideSynchronizeLdapUser v1.0
 :Requires: eZ Publish 5.3.x or newer  and  IMAG/LDAP bundle 
 :Author: Open Wide http://www.openwide.fr
 
@@ -39,13 +39,13 @@ Get the Bundle
 
 Composer
 --------
-Add OwSynchronizeLdapUser in your project's `composer.json`
+Add OpenWideSynchronizeLdapUser in your project's `composer.json`
 
 .. code-block:: json
 
     {
         "require": {
-            "ow/synchronizeldapuser-bundle": "dev-master"
+            "open-wide/synchronizeldapuser-bundle": "dev-master"
         }
     }
 
@@ -62,7 +62,7 @@ Enable the Bundle
     {
         $bundles = array(
             // ...
-            new Ow\SynchronizeLdapUserBundle\OwSynchronizeLdapUserBundle(),
+            new OpenWide\SynchronizeLdapUserBundle\OpenWideSynchronizeLdapUserBundle(),
         );
     }
 
@@ -147,7 +147,7 @@ Then configures config.yml.
 
 .. code-block:: php
 
-    ow_synchronize_ldap_user:
+    openwide_synchronize_ldap_user:
         enabled: true
         synchronize: true
         parent_group_content_id: 223

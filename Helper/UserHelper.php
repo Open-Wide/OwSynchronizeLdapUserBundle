@@ -1,6 +1,6 @@
 <?php
 
-namespace Ow\SynchronizeLdapUserBundle\Helper;
+namespace OpenWide\SynchronizeLdapUserBundle\Helper;
 
 use eZUser;
 use eZ\Publish\API\Repository\Repository;
