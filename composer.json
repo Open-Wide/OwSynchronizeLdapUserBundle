@@ -19,7 +19,7 @@
         "imag/ldap-bundle": "master"
     },
     "autoload": {
-        "psr-0": { "OpenWide\\OwSynchronizeLdapUserBundle": "" }
+        "psr-0": { "OpenWide\\SynchronizeLdapUserBundle": "" }
     },
 
     "target-dir": "OpenWide/SynchronizeLdapUserBundle"
