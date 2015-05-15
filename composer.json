@@ -1,5 +1,5 @@
 {
-    "name": "open-wide/synchronizeldapuser-bundle",
+    "name": "open-wide/ezpublish-synchronizeldapuser-bundle",
     "description": "Synchronize Ldap User to Ezpublish 5.3 or newer",
     "homepage": "https://github.com/Open-Wide/SynchronizeLdapUserBundle",
     "license": "GPL-3.0+",
