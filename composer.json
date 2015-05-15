@@ -3,7 +3,7 @@
     "description": "Synchronize Ldap User to Ezpublish 5.3 or newer",
     "homepage": "https://github.com/Open-Wide/SynchronizeLdapUserBundle",
     "license": "GPL-3.0+",
-    "keywords": ["ezpublish", "ldap", "imag/ldap-bundle"],
+    "keywords": ["ezpublish", "ldap", "imag"],
     "authors": [
         {
             "name": "Duc Nicolas for Open Wide",
