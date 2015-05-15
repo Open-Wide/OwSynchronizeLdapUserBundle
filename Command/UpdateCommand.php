@@ -22,7 +22,7 @@ class UpdateCommand extends ContainerAwareCommand
     {
         $username = $input->getArgument('username');
         $output->writeln("Update rights for ".$username);
-        $userHelper = $this->getContainer()->get('ow_synchronize_ldap_user.user_helper')->synchronizeUserAndGroup($username) ;
+        $userHelper = $this->getContainer()->get('openwide_synchronize_ldap_user.user_helper')->synchronizeUserAndGroup($username) ;
         $output->writeln("End");
     }
 }
