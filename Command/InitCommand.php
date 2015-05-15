@@ -21,13 +21,13 @@ class InitCommand extends ContainerAwareCommand
     {
         $output->writeln("Init rights for all user");
         
-        $users = $this->getContainer()->get('ow_synchronize_ldap_user.user_helper')->getAllUserLdap() ;
+        $users = $this->getContainer()->get('openwide_synchronize_ldap_user.user_helper')->getAllUserLdap() ;
 
         $i = 1;
         foreach($users as $username){
             if(isset($username['uid'][0])){
                 $output->writeln($i ." ".$username['uid'][0]);
-                $userHelper = $this->getContainer()->get('ow_synchronize_ldap_user.user_helper')->synchronizeUserAndGroup($username['uid'][0]) ;
+                $userHelper = $this->getContainer()->get('openwide_synchronize_ldap_user.user_helper')->synchronizeUserAndGroup($username['uid'][0]) ;
                 $i++;
             }
         }
