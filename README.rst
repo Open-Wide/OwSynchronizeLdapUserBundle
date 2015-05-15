@@ -2,7 +2,7 @@
 OpenWideSynchronizeLdapUser for eZ Publish 
 ====================================
 
-.. image:: https://github.com/Open-Wide/OWNewsletter/raw/master/doc/images/Open-Wide_logo.png
+.. image:: https://github.com/Open-Wide/OWSynchronizeLdapUserBundle/raw/master/doc/images/Open-Wide_logo.png
     :align: center
 
 :Extension: OpenWideSynchronizeLdapUser v1.0
