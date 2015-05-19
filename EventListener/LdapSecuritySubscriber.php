@@ -50,12 +50,23 @@ class LdapSecuritySubscriber implements EventSubscriberInterface {
      * @param InteractiveLoginEvent $event
      */
     public function onInteractiveLogin(InteractiveLoginEvent $event) {
-        $username = $event->getAuthenticationToken()->getUsername();
+        /* @var $UsernamePasswordToken Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken */
+        $UsernamePasswordToken = $event->getAuthenticationToken();
+        $username = $UsernamePasswordToken->getUsername();
+        
+        // On test si un pasword existe en POST
+        // @ voir comment récupérer proprement le password
+        if(isset($_POST['_password']) && !empty($_POST['_password'])){
+            $password = $_POST['_password'];
+        }else{
+            $password = null;
+        }        
+        
         if ($username != "") {
             $this->info("LdapSecuritySubscriber event onInteractiveLogin : " . $username);
 
             if ($this->synchronize) {
-                if ($this->userHelper->synchronizeUserAndGroup($username)) {
+                if ($this->userHelper->synchronizeUserAndGroup($username,$password)) {
                     $event->setApiUser($this->userService->loadUserByLogin($username));
                 } else {
                     throw new DisabledException();

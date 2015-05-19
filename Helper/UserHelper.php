@@ -82,7 +82,11 @@ class UserHelper {
      * @param type $username
      * @return type
      */
-    public function synchronizeUserAndGroup($username) {
+    public function synchronizeUserAndGroup($username,$password=null) {
+        
+        if($password){
+            $this->password = $password;
+        }
         
         try {
             $userAdmin = $this->userService->loadUser($this->adminId);
