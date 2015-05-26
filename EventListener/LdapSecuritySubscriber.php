@@ -28,12 +28,15 @@ class LdapSecuritySubscriber implements EventSubscriberInterface {
     private $logger;
     private $synchronize;
     private $defaultUser;
+    private $strtolower;
+    
 
-    public function __construct(UserService $userService, UserHelper $userHelper, $synchronize, $defaultUser, Logger $logger) {
+    public function __construct(UserService $userService, UserHelper $userHelper, $synchronize, $defaultUser, $strtolower, Logger $logger) {
         $this->userService = $userService;
         $this->userHelper = $userHelper;
         $this->synchronize = $synchronize;
         $this->defaultUser = $defaultUser;
+        $this->strtolower = $strtolower;
         $this->logger = $logger;
     }
 
@@ -63,7 +66,12 @@ class LdapSecuritySubscriber implements EventSubscriberInterface {
         }        
         
         if ($username != "") {
-            $this->info("LdapSecuritySubscriber event onInteractiveLogin : " . $username);
+            $this->info("LdapSecuritySubscriber event onInteractiveLogin : " . $username." ".  strtolower($username));
+            
+            if($this->strtolower){
+                // On force le username en minuscule
+                $username = strtolower($username);
+            }
 
             if ($this->synchronize) {
                 if ($this->userHelper->synchronizeUserAndGroup($username,$password)) {

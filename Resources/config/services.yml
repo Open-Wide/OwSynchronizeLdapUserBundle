@@ -23,6 +23,7 @@ parameters:
     open_wide_synchronize_ldap_user.admin.id: 14
     open_wide_synchronize_ldap_user.synchronize: true
     open_wide_synchronize_ldap_user.default_user: ~
+    open_wide_synchronize_ldap_user.strtolower: true
     
 services:
     open_wide_synchronize_ldap_user.user_helper:
@@ -58,6 +59,7 @@ services:
             - @open_wide_synchronize_ldap_user.user_helper
             - %open_wide_synchronize_ldap_user.synchronize%
             - %open_wide_synchronize_ldap_user.default_user%
+            - %open_wide_synchronize_ldap_user.strtolower%
             - @logger
         tags:
             - { name: kernel.event_subscriber }

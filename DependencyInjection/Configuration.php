@@ -19,6 +19,7 @@ class Configuration implements ConfigurationInterface {
                     ->booleanNode('enabled')->defaultFalse()->end()
                     ->booleanNode('synchronize')->defaultTrue()->end()
                     ->scalarNode('default_user')->defaultValue('')->end()
+                    ->booleanNode('strtolower')->defaultTrue()->end()
                     ->booleanNode('verbose')->defaultFalse()->end()
                     ->integerNode('parent_group_content_id')->min(0)->defaultValue(11)->end()
                     ->integerNode('parent_group_location_id')->min(0)->defaultValue(12)->end()

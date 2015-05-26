@@ -28,6 +28,7 @@ class OpenWideSynchronizeLdapUserExtension extends Extension
             $container->setParameter('open_wide_synchronize_ldap_user.mode', $config['mode']);
             $container->setParameter('open_wide_synchronize_ldap_user.synchronize', $config['synchronize']);
             $container->setParameter('open_wide_synchronize_ldap_user.default_user', $config['default_user']);
+            $container->setParameter('open_wide_synchronize_ldap_user.strtolower', $config['strtolower']);
             $container->setParameter('open_wide_synchronize_ldap_user.base_dn', $config['ldap']['base_dn']);
             $container->setParameter('open_wide_synchronize_ldap_user.filter_user', $config['ldap']['filter_user']);
             $container->setParameter('open_wide_synchronize_ldap_user.filter_all_user', $config['ldap']['filter_all_user']);
