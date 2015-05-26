@@ -182,7 +182,7 @@ class UserHelper {
             $groupUser = array();
             if (is_array($this->infoUserLdapOrigin) && isset($this->infoUserLdapOrigin['count']) && isset($this->infoUserLdapOrigin[0][$this->fieldMemberOf])) {
                 foreach ($this->infoUserLdapOrigin[0][$this->fieldMemberOf] as $key => $value) {
-                    if ($key != "count") {
+                    if (is_numeric($key)) {
                         if (strstr($value, $this->filterMemberOf)) {
                             $groupUser[] = array(
                                 'name' => substr($value, 3, (strlen($this->filterMemberOf) + 1) * (-1)),
