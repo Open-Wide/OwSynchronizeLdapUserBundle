@@ -31,7 +31,7 @@ class LdapSecuritySubscriber implements EventSubscriberInterface {
     private $strtolower;
     
 
-    public function __construct(UserService $userService, UserHelper $userHelper, $synchronize, $defaultUser, $strtolower, Logger $logger) {
+    public function __construct(UserService $userService, $userHelper, $synchronize, $defaultUser, $strtolower, Logger $logger) {
         $this->userService = $userService;
         $this->userHelper = $userHelper;
         $this->synchronize = $synchronize;

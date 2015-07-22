@@ -103,7 +103,7 @@ class UserHelper {
                 if ($this->mode == "password") {
                     $this->APIuser = $this->updatePassword($user->id, $username, $this->password);
                     $this->info("Update password EZ " . $username);
-                }                
+                }
                 if ($this->mode == "update") {
                     $this->APIuser = $this->updateUser($user->id, $username, $this->password, $this->infoUserLdap);
                     $this->info("Update user EZ " . $username);
@@ -159,8 +159,6 @@ class UserHelper {
             $this->err("searchInfoUser: " . $e->getMessage());
             throw $e;
         }
-        //For test if non connexion width ldap 
-        //$this->infoUserLdapOrigin = $this->getValueTest($username);
 
         if ($this->infoUserLdapOrigin['count'] == 0) {
             throw new Exception('No LDAP account matching the search');
@@ -334,36 +332,48 @@ class UserHelper {
      */
     protected function updateUser($userId, $username, $password, $fields) {
         try {
-            
             $this->updatePassword($userId, $username, $password);
-            
-            $contentInfo = $this->repository->getContentService()->loadContentInfo($userId);
-            $contentDraft = $this->repository->getContentService()->createContentDraft($contentInfo);
-            $contentUpdateStruct = $this->repository->getContentService()->newContentUpdateStruct();
-            $contentUpdateStruct->initialLanguageCode = 'fre-FR';
+            $content = $this->repository->getContentService()->loadContent($userId);
 
+            // On cherche si il y a des modifications par rapport à la version précédente.
+            $update = false;
             foreach ($this->fieldsUserLdap as $key => $value) {
                 if (isset($this->fieldsUserEz[$key]) && isset($fields[$value])) {
-                    $contentUpdateStruct->setField($this->fieldsUserEz[$key], $fields[$value]);
+                    if ($content->getFieldValue($this->fieldsUserEz[$key])->__toString() != (string)$fields[$value]) {
+                        $update = true;
+                    }
                 }
             }
 
-            $contentDraft = $this->repository->getContentService()->updateContent($contentDraft->versionInfo, $contentUpdateStruct);
-            $content = $this->repository->getContentService()->publishVersion($contentDraft->versionInfo);
-            
+            if ($update) {
+
+                $contentInfo = $this->repository->getContentService()->loadContentInfo($userId);
+                $contentDraft = $this->repository->getContentService()->createContentDraft($contentInfo);
+                $contentUpdateStruct = $this->repository->getContentService()->newContentUpdateStruct();
+                $contentUpdateStruct->initialLanguageCode = 'fre-FR';
+
+                foreach ($this->fieldsUserLdap as $key => $value) {
+                    if (isset($this->fieldsUserEz[$key]) && isset($fields[$value])) {
+                        $contentUpdateStruct->setField($this->fieldsUserEz[$key], $fields[$value]);
+                    }
+                }
+
+                $contentDraft = $this->repository->getContentService()->updateContent($contentDraft->versionInfo, $contentUpdateStruct);
+                $content = $this->repository->getContentService()->publishVersion($contentDraft->versionInfo);
+            }
         } catch (Exception $e) {
             $this->err("Unable to update user : " . $e->getMessage());
             throw $e;
         }
     }
 
-    protected function updatePassword($userId,$username, $password) {
+    protected function updatePassword($userId, $username, $password) {
 
         try {
             $legacyKernelClosure = $this->kernel;
             $loginExist = $legacyKernelClosure()->runCallback(
-                    function () use ( $userId,$username, $password ) {
-                $ezUser = eZUser::fetch($userId);            
+                    function () use ( $userId, $username, $password ) {
+                $ezUser = eZUser::fetch($userId);
                 $ezUser->setAttribute('password_hash', md5("$username\n$password"));
                 $ezUser->store();
             }
@@ -606,265 +616,6 @@ class UserHelper {
             throw new Exception('No LDAP account matching the search');
         }
         return $ldapInfoUser;
-    }
-
-    /**
-     * test value 
-     * @return type
-     */
-    private function getValueTest($username) {
-        if ($username == "gauss")
-            return array(
-                'count' => 1,
-                '0' => array(
-                    'objectclass' => array(
-                        'count' => 4,
-                        '0' => 'top',
-                        '1' => 'person',
-                        '2' => 'organizationalPerson',
-                        '3' => 'user',
-                    ),
-                    '0' => 'objectclass',
-                    'cn' => array(
-                        'count' => 1,
-                        '0' => 'DEDE Jack',
-                    ),
-                    '1' => 'cn',
-                    'sn' => array(
-                        'count' => 1,
-                        '0' => 'DEDE',
-                    ),
-                    '2' => 'sn',
-                    'postofficebox' => array(
-                        'count' => 1,
-                        '0' => '22222',
-                    ),
-                    '3' => 'postofficebox',
-                    'givenname' => array(
-                        'count' => 1,
-                        '0' => 'Jack',
-                    ),
-                    '4' => 'givenname',
-                    'distinguishedname' => array(
-                        'count' => 1,
-                        '0' => 'CN=DEDE Jack,OU=Utilisateurs,OU=CG85,DC=cg85,DC=fr',
-                    ),
-                    '5' => 'distinguishedname',
-                    'instancetype' => array(
-                        'count' => 1,
-                        '0' => 4,
-                    ),
-                    '6' => 'instancetype',
-                    'displayname' => array(
-                        'count' => 1,
-                        '0' => 'DEDE Jack',
-                    ),
-                    '7' => 'displayname',
-                    'memberof' => array(
-                        'count' => 3,
-                        '0' => 'CN=intranet,OU=Droits INTRANET,OU=Groupes Applications,OU=Groupes,OU=CG85,DC=cg85,DC=fr',
-                        '1' => 'CN=intranet.contributeur,OU=Droits INTRANET,OU=Groupes Applications,OU=Groupes,OU=CG85,DC=cg85,DC=fr',
-                        '2' => 'CN=intranet.di,OU=Droits INTRANET,OU=Groupes Applications,OU=Groupes,OU=CG85,DC=cg85,DC=fr',
-                    ),
-                    '8' => 'memberof',
-                    'mail' => array(
-                        'count' => 1,
-                        '0' => 'jack.dede@test.fr',
-                    ),
-                    '10' => 'mail',
-                    'extensionattribute12' => array(
-                        'count' => 1,
-                        '0' => 'extensionattribute12',
-                    ),
-                    '11' => 'extensionattribute12',
-                    'extensionattribute13' => array(
-                        'count' => 1,
-                        '0' => 'extensionattribute13',
-                    ),
-                    '12' => 'extensionattribute13',
-                    'extensionattribute14' => array(
-                        'count' => 1,
-                        '0' => 'extensionattribute14',
-                    ),
-                    '13' => 'extensionattribute14',
-                    'extensionattribute15' => array(
-                        'count' => 1,
-                        '0' => 'extensionattribute15',
-                    ),
-                    '14' => 'extensionattribute15',
-                    'l' => array(
-                        'count' => 1,
-                        '0' => 'lyon',
-                    ),
-                    '15' => 'l',
-                    'othertelephone' => array(
-                        'count' => 1,
-                        '0' => 'othertelephone',
-                    ),
-                    '16' => 'othertelephone',
-                    'physicaldeliveryofficename' => array(
-                        'count' => 1,
-                        '0' => 'physicaldeliveryofficename',
-                    ),
-                    '17' => 'physicaldeliveryofficename',
-                    'postalcode' => array(
-                        'count' => 1,
-                        '0' => '69100',
-                    ),
-                    '18' => 'postalcode',
-                    'streetaddress' => array(
-                        'count' => 1,
-                        '0' => '6 avenue Salvador allede',
-                    ),
-                    '19' => 'streetaddress',
-                    'telephonenumber' => array(
-                        'count' => 1,
-                        '0' => '7896451565',
-                    ),
-                    '20' => 'telephonenumber',
-                    'title' => array(
-                        'count' => 1,
-                        '0' => '06774125896',
-                    ),
-                    '21' => 'title',
-                    'samaccountname' => array(
-                        'count' => 1,
-                        '0' => 'dedejack',
-                    ),
-                    '22' => 'samaccountname',
-                    'employeeid' => array(
-                        'count' => 1,
-                        '0' => '2001',
-                    ),
-                    '23' => 'employeeid',
-                )
-            );
-        else
-            return array(
-                'count' => 1,
-                '0' => array(
-                    'objectclass' => array(
-                        'count' => 4,
-                        '0' => 'top',
-                        '1' => 'person',
-                        '2' => 'organizationalPerson',
-                        '3' => 'user',
-                    ),
-                    '0' => 'objectclass',
-                    'cn' => array(
-                        'count' => 1,
-                        '0' => 'Newton Boby',
-                    ),
-                    '1' => 'cn',
-                    'sn' => array(
-                        'count' => 1,
-                        '0' => 'Newton',
-                    ),
-                    '2' => 'sn',
-                    'postofficebox' => array(
-                        'count' => 1,
-                        '0' => '22222',
-                    ),
-                    '3' => 'postofficebox',
-                    'givenname' => array(
-                        'count' => 1,
-                        '0' => 'Boby',
-                    ),
-                    '4' => 'givenname',
-                    'distinguishedname' => array(
-                        'count' => 1,
-                        '0' => 'CN=Newton Boby,OU=Utilisateurs,OU=CG85,DC=cg85,DC=fr',
-                    ),
-                    '5' => 'distinguishedname',
-                    'instancetype' => array(
-                        'count' => 1,
-                        '0' => 4,
-                    ),
-                    '6' => 'instancetype',
-                    'displayname' => array(
-                        'count' => 1,
-                        '0' => 'Newton Boby',
-                    ),
-                    '7' => 'displayname',
-                    'memberof' => array(
-                        'count' => 3,
-                        '0' => 'CN=intranet,OU=Droits INTRANET,OU=Groupes Applications,OU=Groupes,OU=CG85,DC=cg85,DC=fr',
-                        '1' => 'CN=intranet.testeur,OU=Droits INTRANET,OU=Groupes Applications,OU=Groupes,OU=CG85,DC=cg85,DC=fr',
-                        '2' => 'CN=intranet.di,OU=Droits INTRANET,OU=Groupes Applications,OU=Groupes,OU=CG85,DC=cg85,DC=fr',
-                    ),
-                    '8' => 'memberof',
-                    'mail' => array(
-                        'count' => 1,
-                        '0' => 'boby.newton@test.fr',
-                    ),
-                    '10' => 'mail',
-                    'extensionattribute12' => array(
-                        'count' => 1,
-                        '0' => 'extensionattribute12',
-                    ),
-                    '11' => 'extensionattribute12',
-                    'extensionAttribute13' => array(
-                        'count' => 1,
-                        '0' => 'extensionattribute13',
-                    ),
-                    '12' => 'extensionattribute13',
-                    'extensionAttribute14' => array(
-                        'count' => 1,
-                        '0' => 'extensionattribute14',
-                    ),
-                    '13' => 'extensionattribute14',
-                    'extensionAttribute15' => array(
-                        'count' => 1,
-                        '0' => 'extensionattribute15',
-                    ),
-                    '14' => 'extensionattribute15',
-                    'l' => array(
-                        'count' => 1,
-                        '0' => 'lyon',
-                    ),
-                    '15' => 'l',
-                    'othertelephone' => array(
-                        'count' => 1,
-                        '0' => 'othertelephone',
-                    ),
-                    '16' => 'othertelephone',
-                    'physicaldeliveryofficename' => array(
-                        'count' => 1,
-                        '0' => 'physicaldeliveryofficename',
-                    ),
-                    '17' => 'physicaldeliveryofficename',
-                    'postalcode' => array(
-                        'count' => 1,
-                        '0' => '69100',
-                    ),
-                    '18' => 'postalcode',
-                    'streetaddress' => array(
-                        'count' => 1,
-                        '0' => '6 avenue Salvador allede',
-                    ),
-                    '19' => 'streetaddress',
-                    'telephoneNumber' => array(
-                        'count' => 1,
-                        '0' => '7896451565',
-                    ),
-                    '20' => 'telephonenumber',
-                    'title' => array(
-                        'count' => 1,
-                        '0' => '06774125896',
-                    ),
-                    '21' => 'title',
-                    'samaccountname' => array(
-                        'count' => 1,
-                        '0' => 'newton',
-                    ),
-                    '22' => 'samaccountname',
-                    'employeeid' => array(
-                        'count' => 1,
-                        '0' => '2004',
-                    ),
-                    '23' => 'employeeid',
-                )
-            );
     }
 
 }
