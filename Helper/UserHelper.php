@@ -15,6 +15,12 @@ use Exception;
 class UserHelper {
 
     /**
+     * 
+     */
+    protected $container;
+
+
+    /**
      * @var \eZ\Publish\API\Repository\Repository
      */
     protected $repository;
@@ -29,7 +35,15 @@ class UserHelper {
      * @var $ldapService \IMAG\LdapBundle\Manager\LdapConnection
      */
     protected $ldapService;
+    
+    
     protected $logger;
+    
+    
+    
+    /**
+     * Parameters
+     */
     protected $groupLdapLocationId;
     protected $groupLdapContentId;
     protected $password;
@@ -54,27 +68,32 @@ class UserHelper {
     protected $groupEzName;
     protected $posEz;
 
-    public function __construct(Repository $repository, $kernel, UserService $userService, LdapConnection $ldapService, Logger $logger, $groupLdapLocationId, $groupLdapContentId, $password, $fieldsUserLdap, $fieldsUserEz, $fieldsGroupLdap, $fieldsGroupEz, $mode, $baseDn, $filterUser, $filterAllUser, $filterMemberOf, $fieldMemberOf, $verbose, $adminId) {
-        $this->repository = $repository;
-        $this->kernel = $kernel;
-        $this->userService = $userService;
-        $this->ldapService = $ldapService;
-        $this->logger = $logger;
-        $this->groupLdapLocationId = $groupLdapLocationId;
-        $this->groupLdapContentId = $groupLdapContentId;
-        $this->password = $password;
-        $this->fieldsUserLdap = $fieldsUserLdap;
-        $this->fieldsUserEz = $fieldsUserEz;
-        $this->fieldsGroupLdap = $fieldsGroupLdap;
-        $this->fieldsGroupEz = $fieldsGroupEz;
-        $this->mode = $mode;
-        $this->baseDn = $baseDn;
-        $this->filterUser = $filterUser;
-        $this->filterAllUser = $filterAllUser;
-        $this->filterMemberOf = $filterMemberOf;
-        $this->fieldMemberOf = $fieldMemberOf;
-        $this->verbose = $verbose;
-        $this->adminId = $adminId;
+    public function __construct($container, $ldapService) {
+        $this->container = $container;
+
+        // Services
+        $this->repository  = $this->container->get('ezpublish.api.repository');
+        $this->kernel      = $this->container->get('ezpublish_legacy.kernel');
+        $this->userService = $this->container->get('ezpublish.api.service.user');
+        $this->ldapService = $ldapService; 
+        $this->logger      = $this->container->get('logger');
+        
+        // Parameters
+        $this->groupLdapLocationId = $this->container->getParameter('open_wide_synchronize_ldap_user.ldap.parent_group.location_id');
+        $this->groupLdapContentId = $this->container->getParameter('open_wide_synchronize_ldap_user.ldap.parent_group.content_id');
+        $this->password = $this->container->getParameter('open_wide_synchronize_ldap_user.ldap.user_password');
+        $this->fieldsUserLdap = $this->container->getParameter('open_wide_synchronize_ldap_user.ldap.fields_user_ldap');
+        $this->fieldsUserEz = $this->container->getParameter('open_wide_synchronize_ldap_user.ldap.fields_user_ez');
+        $this->fieldsGroupLdap = $this->container->getParameter('open_wide_synchronize_ldap_user.ldap.fields_group_ldap');
+        $this->fieldsGroupEz = $this->container->getParameter('open_wide_synchronize_ldap_user.ldap.fields_group_ez');
+        $this->mode = $this->container->getParameter('open_wide_synchronize_ldap_user.mode');
+        $this->baseDn = $this->container->getParameter('open_wide_synchronize_ldap_user.base_dn');
+        $this->filterUser = $this->container->getParameter('open_wide_synchronize_ldap_user.filter_user');
+        $this->filterAllUser = $this->container->getParameter('open_wide_synchronize_ldap_user.filter_all_user');
+        $this->filterMemberOf = $this->container->getParameter('open_wide_synchronize_ldap_user.filter_member_of');
+        $this->fieldMemberOf = $this->container->getParameter('open_wide_synchronize_ldap_user.field_member_of');
+        $this->verbose = $this->container->getParameter('open_wide_synchronize_ldap_user.verbose');
+        $this->adminId = $this->container->getParameter('open_wide_synchronize_ldap_user.admin.id');
     }
 
     /**

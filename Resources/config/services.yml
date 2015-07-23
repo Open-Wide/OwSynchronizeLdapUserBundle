@@ -29,26 +29,8 @@ services:
     open_wide_synchronize_ldap_user.user_helper:
         class: %open_wide_synchronize_ldap_user.user_helper.class%
         arguments: 
-          - @ezpublish.api.repository
-          - @ezpublish_legacy.kernel
-          - @ezpublish.api.service.user
+          - @service_container
           - @imag_ldap.ldap_connection
-          - @logger
-          - %open_wide_synchronize_ldap_user.ldap.parent_group.location_id%
-          - %open_wide_synchronize_ldap_user.ldap.parent_group.content_id%
-          - %open_wide_synchronize_ldap_user.ldap.user_password%
-          - %open_wide_synchronize_ldap_user.ldap.fields_user_ldap%
-          - %open_wide_synchronize_ldap_user.ldap.fields_user_ez%
-          - %open_wide_synchronize_ldap_user.ldap.fields_group_ldap%
-          - %open_wide_synchronize_ldap_user.ldap.fields_group_ez%
-          - %open_wide_synchronize_ldap_user.mode%
-          - %open_wide_synchronize_ldap_user.base_dn%
-          - %open_wide_synchronize_ldap_user.filter_user%
-          - %open_wide_synchronize_ldap_user.filter_all_user%
-          - %open_wide_synchronize_ldap_user.filter_member_of%
-          - %open_wide_synchronize_ldap_user.field_member_of%
-          - %open_wide_synchronize_ldap_user.verbose%
-          - %open_wide_synchronize_ldap_user.admin.id%
         tags:
             - { name: monolog.logger, channel: synchronize }
 
