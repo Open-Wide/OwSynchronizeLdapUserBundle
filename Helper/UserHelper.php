@@ -81,7 +81,8 @@ class UserHelper {
         // Parameters
         $this->groupLdapLocationId = $this->container->getParameter('open_wide_synchronize_ldap_user.ldap.parent_group.location_id');
         $this->groupLdapContentId = $this->container->getParameter('open_wide_synchronize_ldap_user.ldap.parent_group.content_id');
-        $this->password = $this->container->getParameter('open_wide_synchronize_ldap_user.ldap.user_password');
+        //$this->password = $this->container->getParameter('open_wide_synchronize_ldap_user.ldap.user_password');
+        $this->password = NULL;
         $this->fieldsUserLdap = $this->container->getParameter('open_wide_synchronize_ldap_user.ldap.fields_user_ldap');
         $this->fieldsUserEz = $this->container->getParameter('open_wide_synchronize_ldap_user.ldap.fields_user_ez');
         $this->fieldsGroupLdap = $this->container->getParameter('open_wide_synchronize_ldap_user.ldap.fields_group_ldap');
@@ -115,15 +116,20 @@ class UserHelper {
 
             $parentGroup = $this->userService->loadUserGroup($this->groupLdapContentId);
 
-            if (!($user = $this->findUserByDn($this->infoUserLdap['distinguishedname']))) {
+            if (!($user = $this->findUserByDn($this->infoUserLdap['distinguishedname'])))
+            {
                 $this->APIuser = $this->newUser(array($parentGroup), $username, $this->password, "fre-FR", $this->infoUserLdap);
                 $this->info("Add user EZ " . $username);
-            } else {
-                if ($this->mode == "password") {
+            }
+            else
+            {
+                if( ($this->mode == "password") and $this->password )
+                {
                     $this->APIuser = $this->updatePassword($user->id, $username, $this->password);
                     $this->info("Update password EZ " . $username);
                 }
-                if ($this->mode == "update") {
+                if( $this->mode == "update" )
+                {
                     $this->APIuser = $this->updateUser($user->id, $username, $this->password, $this->infoUserLdap);
                     $this->info("Update user EZ " . $username);
                 }
@@ -345,13 +351,19 @@ class UserHelper {
 
     /**
      * Update User
-     * @param $userId
-     * @param type $fields
+     * @param int $userId
+     * @param string $username
+     * @param string $password
+     * @param $fields
      * @throws Exception
      */
     protected function updateUser($userId, $username, $password, $fields) {
-        try {
-            $this->updatePassword($userId, $username, $password);
+        try
+        {
+            if($password)
+            {
+                $this->updatePassword($userId, $username, $password);
+            }
             $content = $this->repository->getContentService()->loadContent($userId);
 
             // On cherche si il y a des modifications par rapport à la version précédente.
